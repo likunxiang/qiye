@@ -1,7 +1,7 @@
 const basics = {
   state: {
     imgUrl: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/',
-    img_url_cat: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/CATEGORY/IMAGES/',  // 品类
+    img_url_cat: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/APRC/CATEGORY/IMAGES/',  // 品类
     img_url_jud: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/JUDGE/IMAGES/',  // 仲裁
     img_url_set_acc: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/SETTLEMENT/ACCEPT/IMAGES/',  // 结算验收通过
     img_url_set_obe: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/SETTLEMENT/OBEY/IMAGES/',  // 结算赔偿支付通过

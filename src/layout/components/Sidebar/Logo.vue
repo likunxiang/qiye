@@ -34,7 +34,7 @@ export default {
   },
   data() {
     return {
-      title: '消费者之家',
+      title: '企业供应管理系统',
       logo: logoImg
     }
   }

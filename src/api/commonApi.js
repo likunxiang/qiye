@@ -158,3 +158,23 @@ export function getDetailByIdAndRK(data) {
     data: data
   })
 }
+
+// 查询一级项目列表(一级供应路径)
+export function getTopParentList(data) {
+  return request({
+    url: '/QueryData?SqlCmdName=aprc\\webSuOrg\\path\\getTopParentList_1_0_1&DBC=w_a',
+    method: 'post',
+    data: data
+  })
+}
+
+// 查询个人/企业儿子路径列表
+export function getSonList(data) {
+  return request({
+    url: '/QueryData?SqlCmdName=aprc\\webSuOrg\\path\\getSonList_1_0_1&DBC=w_a',
+    method: 'post',
+    data: data
+  })
+}
+
+

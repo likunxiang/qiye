@@ -8,6 +8,8 @@ const DeptId = 'Dept-Id'
 
 const ExpiresInKey = 'Admin-Expires-In'
 
+const ProjectObj = 'Project-Obj'
+
 export function getToken() {
   return Cookies.get(TokenKey)
 }
@@ -54,4 +56,12 @@ export function setExpiresIn(time) {
 
 export function removeExpiresIn() {
   return Cookies.remove(ExpiresInKey)
+}
+
+export function getProjectId() {
+  return Cookies.get(ProjectObj)
+}
+
+export function setProjectId(projectObj) {
+  return Cookies.set(ProjectObj, projectObj)
 }

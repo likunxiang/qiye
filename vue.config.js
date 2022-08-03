@@ -34,7 +34,7 @@ module.exports = {
       // detail: https://cli.vuejs.org/config/#devserver-proxy  120.26.89.96  47.114.54.131
       [process.env.VUE_APP_BASE_API]: {
         timeout: 10000, // 请求超时时间
-        target: `http://114.55.106.56:8080`,
+        target: `http://test-service.xiaofeizzj.com:8011`,
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''
