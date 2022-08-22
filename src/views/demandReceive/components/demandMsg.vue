@@ -1,10 +1,9 @@
 <template>
-	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
-		<div class="" style="padding-bottom: 40px;">
+	<el-dialog title=" " :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
+		<div class="" style="padding-bottom: 40px;padding-top: 20px;">
 			<div style="width: 100%;" class="flex flex-center jsb mb20">
 				<div class="flex">
-					<el-image class="mr10" style="width: 100px; height: 100px" :src="imgBasicUrl + row.categoryImg"
-						:fit="fit"></el-image>
+					<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + row.categoryImg"></el-image>
 					<div>
 						<div>{{row.categoryName}}</div>
 						<div>{{row.categoryAlias}}</div>
@@ -14,13 +13,13 @@
 			<div class="title-bg">需求范围设置</div>
 			<div>
 				<div class="title-bg flex flex-center jsb" @click="openList('1')">
-					<div>符合供应范围的需方需求{{(rt1Count)}}</div>
+					<div>符合供应范围的需方需求 ({{rt1Count}})</div>
 					<div class="el-icon-arrow-right"></div>
 				</div>
 			</div>
 			<div>
 				<div class="title-bg flex flex-center jsb" @click="openList('2')">
-					<div>系统推荐的需方需求{{(rt2Count)}}</div>
+					<div>系统推荐的需方需求 ({{rt2Count}})</div>
 					<div class="el-icon-arrow-right"></div>
 				</div>
 			</div>
@@ -74,17 +73,18 @@
 			async countByRT() {
 				await countByRT({
 					supplyPathGuid: this.$store.state.user.projectId.pathGuid,
+					categoryGuid: this.row.categoryGuid,
 					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
 					if(res.OK == 'True') {
-						let rt1Count = res.Tag[0].rt1Count
-						let rt2Count = res.Tag[0].rt2Count
+						this.rt1Count = res.Tag[0].Table[0].rt1Count
+						this.rt2Count = res.Tag[0].Table[0].rt2Count
 					}
 				})
 			}
 		},
 		created() {
-
+			this.countByRT()
 		}
 	};
 </script>

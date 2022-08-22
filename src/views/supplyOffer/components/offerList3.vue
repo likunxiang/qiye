@@ -1,6 +1,6 @@
 <template>
 	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
-		<div style="padding-bottom: 60px;">
+		<div style="padding-bottom: 60px;padding-top: 20px;" v-loading="loading">
 			<div class="title-bg">拒绝报价的需方需求({{pageNumber}})</div>
 			<div class="mb10" style="border-bottom: 1px solid #000;padding-bottom: 10px;" v-for="item in tableData" @click="toDemandDetail(item)">
 				<div class="mb10">{{item.priceTime}}拒绝报价</div>
@@ -16,7 +16,7 @@
 					<div class="el-icon-arrow-right" style="font-size: 36px;"></div>
 				</div>
 			</div>
-			<checkDemand v-if="isDemandDetail" @close="closeDetail" :row="openRow" :type="3"></checkDemand>
+			<checkDemand v-if="isDemandDetail" @close="closeDetail" :catogoryObj="row" :row="openRow" :type="3" @refresh="refreshList"></checkDemand>
 			<pages @changePage="changePage" :total="pageTotal" :page="page"></pages>
 		</div>
 	</el-dialog>
@@ -54,10 +54,15 @@
 				openRow: {},
 				isDemandDetail: false,
 				basicImgUrl: this.$store.state.basics.img_url_cat,
-				tableData: []
+				tableData: [],
+				loading: false
 			};
 		},
 		methods: {
+			refreshList() {
+				this.getMapReqList()
+				this.$emit('refresh')
+			},
 			close() {
 				this.isOpen = false
 				this.$emit('close')
@@ -77,6 +82,7 @@
 				this.isDemandDetail = false
 			},
 			async getMapReqList() {
+				this.loading = false
 				await getMapReqList({
 					supplierGuid: this.row.supplierGuid,
 					priceStatus: '2',
@@ -98,7 +104,7 @@
 			},
 		},
 		created() {
-
+			this.getMapReqList()
 		}
 	};
 </script>

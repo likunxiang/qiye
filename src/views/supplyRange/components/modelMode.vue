@@ -1,26 +1,26 @@
 <template>
-	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose">
-		<div class="">
+	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
+		<div class="" style="padding-top: 20px;">
 			<div style="width: 100%;" class="flex flex-center jsb mb20">
 				<div class="flex">
-					<el-image class="mr10" style="width: 100px; height: 100px" :src="imgBasicUrl + row.categoryImg"
-						:fit="fit"></el-image>
-					<div>
-						<div>{{row.nickName}}</div>
-						<div>{{row.categoryAlias}}</div>
+					<el-image style="width: 100px; height: 100px" :src="basicImgUrl + catogoryObj.categoryImg" fit="fill">
+					</el-image>
+					<div class="ml10">
+						<div>{{catogoryObj.categoryName}}</div>
+						<div>{{catogoryObj.categoryalias}}</div>
 					</div>
 				</div>
 			</div>
 			<div class="title-bg">请完善该型号的需求</div>
-			<div>
-				<div>型号名称</div>
+			<div class="flex flex-center">
+				<div style="width: 80px;flex-shrink: 0;">型号名称</div>
 				<el-input v-model="modelName" placeholder="请填写"></el-input>
 			</div>
-			<plateModel :plateData="plateArr"></plateModel>
+			<plateModel v-if="loading" :plateData="plateArr" @getParamData="getParamData" :pageType="pageType"></plateModel>
 		</div>
 		<span slot="footer" class="dialog-footer">
 			<el-button @click="close">取 消</el-button>
-			<el-button type="primary" @click="submit">保 存</el-button>
+			<el-button type="primary" @click="submit" :disabled="!modelName">保 存</el-button>
 		</span>
 	</el-dialog>
 </template>
@@ -29,12 +29,23 @@
 	import plateModel from "@/views/supplyRange/components/plateModel"
 	import {
 		getSuppyRangeByModel,
-		getPlateEmptyModel
+		getPlateEmptyModel,
+		insertSupplierModelTc,
+		deleteModel
 	} from '@/api/supplyRangeApi/supplyRange.js'
+	import {
+		getNewId,
+	} from '@/api/commonApi.js'
 	export default {
 		name: "index",
 		props: {
 			row: {
+				type: Object,
+				default: () => {
+					return {}
+				}
+			},
+			catogoryObj: {
 				type: Object,
 				default: () => {
 					return {}
@@ -52,10 +63,21 @@
 			return {
 				isOpen: true,
 				modelName: '',
-				plateArr: []
+				plateArr: [],
+				loading: false,
+				basicImgUrl: this.$store.state.basics.img_url_cat,
+				paramData: []
 			};
 		},
 		methods: {
+			async getNewId() {
+				await getNewId().then(res => {
+					console.log(res);
+					let guid = res
+					this.insertSupplierModelTc(guid)
+					
+				})
+			},
 			close() {
 				this.isOpen = false
 				this.$emit('close')
@@ -63,15 +85,26 @@
 			beforeClose() {
 				this.close()
 			},
+			getParamData(data) {
+				this.paramData = data
+				console.log('paramData', data);
+			},
 			submit() {
-
+				if (this.pageType == 'new') {
+					this.getNewId()
+				} else {
+					this.deleteModel()
+				}
+				
 			},
 			// 编辑时用
 			async getSuppyRangeByModel() {
+				this.loading = false
 				await getSuppyRangeByModel({
 					modelGuid: this.row.modelGuid,
 					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
+					this.loading = true
 					if (res.OK == 'True') {
 						if (res.Tag.length) {
 							let data = res.Tag[0].Table
@@ -84,12 +117,14 @@
 			},
 			// 新建时用
 			async getPlateEmptyModel() {
+				this.loading = false
 				await getPlateEmptyModel({
-					categoryGuid: this.row.categoryGuid,
-					catTreeCode: this.row.catTreeCode,
-					bizType: this.row.bizType,
+					categoryGuid: this.catogoryObj.categoryGuid,
+					catTreeCode: this.catogoryObj.catTreeCode || 'supply',
+					bizType: this.catogoryObj.bizType || '1',
 					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
+					this.loading = true
 					if (res.OK == 'True') {
 						if (res.Tag.length) {
 							let data = res.Tag[0].Table
@@ -101,39 +136,97 @@
 				})
 			},
 			// web-供应-型号-新增需求范围内容 -- 提交表单
-			async insertSupplierModelTc() {
+			async insertSupplierModelTc(guid) {
 				let modelObj = {
-					supplierGuId: this.row.supplierGuId,
-					modelGuId: this.row.modelGuId,
+					supplierGuid: this.catogoryObj.supplierGuid,
+					modelGuid: guid,
 					modelName: this.modelName,
 					curUserId: this.$store.state.user.adminId,
 				}
-				for(let i in plateArr) {
-					
+				let plateArr = this.paramData
+				let arr = []
+				console.log('plateArr',plateArr);
+				for (let p in plateArr) {
+					for (let f in plateArr[p].field) {
+						for (let v in plateArr[p].field[f].values) {
+							let contentFDCode = ''
+							if (this.pageType == 'new') {
+								contentFDCode = plateArr[p].field[f].content.length?plateArr[p].field[f].content[0].contentFDCode:''
+							} else {
+								contentFDCode = plateArr[p].field[f].contentFDCode
+							}
+							let obj = {
+								supplierGuid: this.catogoryObj.supplierGuid,
+								modelGuid: guid,
+								plateGuid: plateArr[p].plateGuid,
+								plateCode: plateArr[p].plateFDCode,
+								plateAlias: plateArr[p].alias,
+								plateNorder: plateArr[p].norder,
+								plateFieldGuid: plateArr[p].field[f].fieldGuid,
+								plateFieldAlias: plateArr[p].field[f].alias,
+								plateFieldCode: plateArr[p].field[f].fieldFDCode,
+								plateFieldNorder: plateArr[p].field[f].norder,
+								plateFieldValue: plateArr[p].field[f].values[v].value,
+								fieldContentGc: contentFDCode,
+								operation: plateArr[p].field[f].operation,
+								curUserId: this.$store.state.user.adminId,
+							}
+							arr.push(obj)
+						}
+					}
+
+
 				}
 				const obj1 = {
-					SqlCmdName: 'SqlCmdName=aprc\\webSuOrg\\supplier\\model\\info\\insertModel_1_0_1',
+					SqlCmdName: 'aprc\\webSuOrg\\supplier\\model\\info\\insertModel_1_0_1',
 					DBC: 'w_a',
-					Parameter: JSON.stringify([this.form])
+					Parameter: JSON.stringify([modelObj])
 				}
 				const obj2 = {
-					SqlCmdName: 'SqlCmdName=aprc\\app\\supplier\\model\\info\\insertModelPlates_1_0_1',
+					SqlCmdName: 'aprc\\webSuOrg\\supplier\\model\\info\\insertModelPlates_1_0_1',
 					DBC: 'w_a',
-					Parameter: JSON.stringify(this.moneyData)
+					Parameter: JSON.stringify(arr)
 				}
 				const data = [obj1, obj2]
 				await insertSupplierModelTc(JSON.stringify(data)).then(res => {
-					if(res.OK == 'True') {
-						
+					if (res.OK == 'True') {
+						if (res.Tag[0] > 0) {
+							this.$message({
+								message: '操作成功!',
+								type: 'success'
+							});
+							this.$emit('refresh')
+							this.close()
+						} else {
+							this.$message({
+								message: '操作失败!',
+								type: 'error'
+							});
+						}
+					}
+				})
+			},
+			// 先删除
+			async deleteModel() {
+				let guid = this.row.modelGuid
+				await deleteModel({
+					modelGuid: guid,
+					curUserId: this.$store.state.user.adminId,
+				}).then(res => {
+					if (res.OK == 'True') {
+						if (res.Tag[0] > 0) {
+							this.getNewId()
+						} else {
+						}
 					}
 				})
 			},
 			// web-供应-型号-修改需求范围内容 // TODO
 			// web-供应-型号-查询型号名称是否重复
-			async etModelNameExistsFlag() {
+			async getModelNameExistsFlag() {
 				await etModelNameExistsFlag({
-					supplierGuid: this.row.supplierGuid,
-					modelGuid: this.row.modelGuid || '',
+					supplierGuid: this.catogoryObj.supplierGuid,
+					modelGuid: this.catogoryObj.modelGuid || '',
 					modelName: this.modelName,
 					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
@@ -161,6 +254,9 @@
 				this.getPlateEmptyModel()
 			} else {
 				this.getSuppyRangeByModel()
+				// 先用直接删除
+				// this.getPlateEmptyModel()
+				this.modelName = this.row.modelName
 			}
 		}
 	};

@@ -64,7 +64,7 @@ export function deletePricePlates(data) {
   })
 }
 
-// web-供应-按单-报价(我要报价)  TODO
+// web-供应-按单-报价(我要报价)
 export function insertBillPrice(data) {
 	return request({
 		url: '/ProxyService/aprc_weborg_deReq_insertBillPrice?CustomMimeType=application/json',

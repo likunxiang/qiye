@@ -1,7 +1,7 @@
 <template>
 	<div class="register">
 		<el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="register-form">
-			<h3 class="title">企业供应管理系统</h3>
+			<h3 class="title">机构供应管理系统</h3>
 
 			<el-form-item prop="userName" label="机构名称">
 				<el-input v-model="registerForm.userName" type="text" auto-complete="off" placeholder="机构名称">
@@ -58,8 +58,8 @@
 				codeText: "获取验证码",
 				disabled: false,
 				registerForm: {
-					userName: "李坤祥机构",
-					phonenumber: "17746071523",
+					userName: "",
+					phonenumber: "",
 					code: "",
 				},
 				registerRules: {
@@ -105,22 +105,8 @@
 				if (this.registerForm.phonenumber == "" || this.registerForm.userName == '') {
 					this.$message.error("手机号或机构名称不得为空");
 				} else {
-					let maxNum = 60;
-					let oldCodeText = this.codeText;
-					this.codeText = `${maxNum}s重新发送`; //初始显示倒计时
-					this.disabled = true;
-					this.sendCode(1)
-					let codeCountDown = setInterval(() => {
-
-						let countDownNum = maxNum--;
-						this.codeText = `${countDownNum}s重新发送`;
-						if (countDownNum == 0) {
-							//倒计时结束
-							this.codeText = oldCodeText;
-							clearInterval(codeCountDown);
-							this.disabled = false;
-						}
-					}, 1000);
+					this.sendCode(21)
+					
 				}
 			},
 			// 发送验证码
@@ -128,6 +114,24 @@
 				let phone = this.registerForm.phonenumber
 				await getCode(phone, type).then(res => {
 					console.log(res);
+					if (res.OK == 'True') {
+						let maxNum = 60;
+						let oldCodeText = this.codeText;
+						this.codeText = `${maxNum}s重新发送`; //初始显示倒计时
+						this.disabled = true;
+						
+						let codeCountDown = setInterval(() => {
+						
+							let countDownNum = maxNum--;
+							this.codeText = `${countDownNum}s重新发送`;
+							if (countDownNum == 0) {
+								//倒计时结束
+								this.codeText = oldCodeText;
+								clearInterval(codeCountDown);
+								this.disabled = false;
+							}
+						}, 1000);
+					}
 				})
 			},
 			// 校验验证码是否正确
@@ -144,6 +148,7 @@
 								message: '验证码错误',
 								type: 'error'
 							});
+							this.loading = false;
 						}
 					}
 				})
@@ -155,6 +160,7 @@
 					code: this.registerForm.code,
 					userName: this.registerForm.userName
 				}).then(res => {
+					this.loading = false;
 					if (res.OK == 'True') {
 						if (res.Tag.guid) {
 							// 注册成功
@@ -163,8 +169,24 @@
 								'系统提示', {
 									dangerouslyUseHTMLString: true
 								}).then(() => {
-								this.$router.push("/login");
-							}).catch(() => {});
+								// this.$router.push("/login");
+								console.log(888888);
+								let loginForm = {
+									phonenumber: this.registerForm.phonenumber,
+									code: this.registerForm.code,
+								}
+								this.$store.dispatch("Login", loginForm).then(() => {
+									console.log(77777);
+									this.$router.push({
+										path: this.redirect || "/"
+									}).catch((err) => {
+										console.log('跳转失败', 'err');
+										return
+									});
+								})
+							}).catch(() => {
+								this.loading = false;
+							});
 						}
 					}
 				})

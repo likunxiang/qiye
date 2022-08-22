@@ -4,7 +4,7 @@ import axios from 'axios'
 // web-供应-采购需求接收列表分类数量
 export function countByRT(data) {
   return request({
-    url: '/ExSql?SqlCmdName=aprc\\webSuOrg\\supplier\\mtNotice\\countByRT_1_0_1&DBC=w_a',
+    url: '/QueryData?SqlCmdName=aprc\\webSuOrg\\supplier\\mtNotice\\countByRT_1_0_1&DBC=w_a',
     method: 'post',
     data: data
   })

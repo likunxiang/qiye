@@ -27,18 +27,18 @@
         <div v-for="(field,index) in type.field">
           <div class="mb10 bold">{{field.name}}</div>
           <template v-if="field.operation < 4">
-            <div v-for="(value,index) in field.value">{{value.key}}</div>
+            <div v-for="(value,index) in field.values">{{value.value}}</div>
           </template>
           <template v-else>
             <template v-if="field.operation == 4">
-              <div v-for="(value,index) in field.value" class="mb10 flex flex-center" style="flex-wrap: wrap;">
-                <el-image class="mr10 mb10" :preview-src-list="getImgUrl(value.key)" style="width: 100px; height: 100px"
-                  v-for="(img,index) in getImgUrl(value.key)" :key="index" :src="img"></el-image>
+              <div v-for="(value,index) in field.values" class="mb10 flex flex-center" style="flex-wrap: wrap;">
+                <el-image class="mr10 mb10" :preview-src-list="getImgUrl(value.value)" style="width: 100px; height: 100px"
+                  v-for="(img,index) in getImgUrl(value.value)" :key="index" :src="img"></el-image>
               </div>
             </template>
             <template v-if="field.operation == 5">
               <div v-for="(value,index) in field.value" class="mb10 flex flex-center" style="flex-wrap: wrap;">
-                <div class="mr10 mb10" v-for="(file,index) in getImgUrl(value.key)">{{file.key}}</div>
+                <div class="mr10 mb10" v-for="(file,index) in getImgUrl(value.value)">{{file.value}}</div>
               </div>
             </template>
           </template>

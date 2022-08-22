@@ -58,9 +58,18 @@ export function getOneByType(data) {
 // web-供方-添加品类
 export function addCat(data) {
   return request({
-    url: '/ExSql?SqlCmdName=aprc\\webSuOrg\\supplier\\info\\addCat_1_0_1&DBC=w_a',
+    url: '/QueryData?SqlCmdName=aprc\\webSuOrg\\supplier\\info\\addCat_1_0_1&DBC=w_a',
     method: 'post',
     data: data
+  })
+}
+
+// web-添加未完成交易的需求消息通知
+export function addSupplyNMT(data) {
+  return request({
+    url: '/ProxyService/aprc_webbSuOrg_deReq_addSupplyNMT_1_0_1?CustomMimeType=application/json',
+    method: 'post',
+    params: data
   })
 }
 

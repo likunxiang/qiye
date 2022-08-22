@@ -73,61 +73,6 @@ export const constantRoutes = [{
 		}]
 	},
 	{
-		path: '/ceshiluyou',
-		component: Layout,
-		redirect: 'index',
-		redirect: "noRedirect",
-		alwaysShow: true,
-		meta: {
-			title: '测试路由',
-			icon: '#',
-		},
-		children: [{
-			path: 'index1',
-			component: (resolve) => require(['@/views/ceshiluyou/index'], resolve),
-			name: 'Index1',
-			meta: {
-				title: '测试路由1',
-				icon: 'dashboard',
-			}
-		}, {
-			path: 'index999',
-			component: (resolve) => require(['@/views/ceshiluyou/index999'], resolve),
-			name: 'Index999',
-			meta: {
-				title: '测试路由999',
-				icon: 'dashboard',
-			}
-		},{
-			path: 'ceshiChildren',
-			component: ParentView,
-			name: 'CeshiChildren',
-			meta: {
-				title: '测试路由儿子标题',
-				icon: '#',
-			},
-			children: [{
-				path: '/ceshiluyou/ceshiChildren/index2',
-				component: (resolve) => require(['@/views/ceshiluyou/ceshiChildren/index'], resolve),
-				name: 'Index2',
-				meta: {
-					title: '测试路由儿子内容',
-					icon: '#',
-				},
-			},{
-				path: 'ceshisunzi',
-				component: (resolve) => require(['@/views/ceshiluyou/ceshiChildren/ceshisunzi/index'],
-					resolve),
-				name: 'Ceshisunzi',
-				meta: {
-					title: '测试路由孙子',
-					icon: 'dashboard',
-				}
-			}]
-			
-		}]
-	},
-	{
 		path: '',
 		component: Layout,
 		redirect: 'index',

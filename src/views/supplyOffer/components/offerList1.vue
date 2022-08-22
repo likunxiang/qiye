@@ -1,9 +1,9 @@
 <template>
 	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
-		<div style="padding-bottom: 60px;">
+		<div style="padding-bottom: 60px;padding-top: 20px;" v-loading="loading">
 			<div class="title-bg">未报价的需方需求({{pageNumber}})</div>
 			<div class="mb10" style="border-bottom: 1px solid #000;padding-bottom: 10px;" v-for="item in tableData" @click="toDemandDetail(item)">
-				<el-button type="danger" class="mb10" @click.stop="refuseOffer">拒绝报价</el-button>
+				<el-button type="danger" class="mb10" @click.stop="refuseOffer(item)">拒绝报价</el-button>
 				<div class="category-item flex-center">
 					<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + row.categoryImg"></el-image>
 					<div class="flex jsb mr20" style="flex: 1; height: 100px;">
@@ -17,7 +17,7 @@
 				</div>
 			</div>
 			<pages @changePage="changePage" :total="pageTotal" :page="page"></pages>
-			<checkDemand v-if="isDemandDetail" @close="closeDetail" :row="openRow" :type="1"></checkDemand>
+			<checkDemand v-if="isDemandDetail" @close="closeDetail" :catogoryObj="row" :row="openRow" :type="1" @refresh="refreshList"></checkDemand>
 		</div>
 	</el-dialog>
 </template>
@@ -43,7 +43,8 @@
 			}
 		},
 		components: {
-			pages
+			pages,
+			checkDemand
 		},
 		data() {
 			return {
@@ -53,10 +54,15 @@
 				openRow: {},
 				isDemandDetail: false,
 				basicImgUrl: this.$store.state.basics.img_url_cat,
-				tableData: []
+				tableData: [],
+				loading: false,
 			};
 		},
 		methods: {
+			refreshList() {
+				this.getMapReqList()
+				this.$emit('refresh')
+			},
 			close() {
 				this.isOpen = false
 				this.$emit('close')
@@ -81,10 +87,11 @@
 					cancelButtonText: '取消',
 					type: 'warning'
 				}).then(() => {
-					this.rejectGivePrice(row.rejectGivePrice)
+					this.rejectGivePrice(row.requestSupplyGuid)
 				}).catch(() => {});
 			},
 			async getMapReqList() {
+				this.loading = true
 				await getMapReqList({
 					supplierGuid: this.row.supplierGuid,
 					priceStatus: '1',
@@ -115,7 +122,8 @@
 								message: '操作成功!',
 								type: 'success'
 							});
-							this.countPriceStatus()
+							this.getMapReqList()
+							this.$emit('refresh')
 						} else {
 							this.$message({
 								message: '操作失败!',
@@ -128,7 +136,7 @@
 			}
 		},
 		created() {
-
+			this.getMapReqList()
 		}
 	};
 </script>

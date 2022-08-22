@@ -1,6 +1,6 @@
 <template>
 	<el-dialog title="" :visible.sync="isOpen" width="900px" @close="beforeClose">
-		<div class="" style="padding-bottom: 60px;">
+		<div class="" style="padding-bottom: 60px;padding-top: 20px;">
 			<div style="width: 100%;" class="flex flex-center jsb mb20">
 				<div class="flex">
 					<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + row.categoryImg">
@@ -34,8 +34,9 @@
 					<div class="el-icon-arrow-right"></div>
 				</div>
 			</div>
-			<offerList1 v-if="isList & listType =='1'" @close="closeList" :row="row" :pageNumber='priceStatus1'></offerList1>
-			<offerList2 v-if="isList & listType =='2'" @close="closeList" :row="row" :pageNumber='priceStatus2'></offerList2>
+			<offerList1 v-if="isList & listType =='1'" @close="closeList" :row="row" :pageNumber='priceStatus1' @refresh="countPriceStatus"></offerList1>
+			<offerList2 v-if="isList & listType =='2'" @close="closeList" :row="row" :pageNumber='priceStatus2' @refresh="countPriceStatus"></offerList2>
+			<offerList3 v-if="isList & listType =='3'" @close="closeList" :row="row" :pageNumber='priceStatus3' @refresh="countPriceStatus"></offerList3>
 		</div>
 	</el-dialog>
 </template>
@@ -49,6 +50,7 @@
 	} from '@/api/supplyOfferApi/supplyOffer.js'
 	import offerList1 from './offerList1.vue'
 	import offerList2 from './offerList2.vue'
+	import offerList3 from './offerList3.vue'
 	export default {
 		name: "index",
 		props: {
@@ -61,15 +63,16 @@
 		},
 		components: {
 			offerList1,
-			offerList2
+			offerList2,
+			offerList3
 		},
 		data() {
 			return {
 				isOpen: true,
 				rangeValue: false,
-				priceStatus1: 0,
-				priceStatus2: 0,
-				priceStatus3: 0,
+				priceStatus1: '0',
+				priceStatus2: '0',
+				priceStatus3: '0',
 				isList: false,
 				listType: '1',
 				basicImgUrl: this.$store.state.basics.img_url_cat
@@ -174,13 +177,13 @@
 					if (res.OK == 'True') {
 						if (res.Tag.length) {
 							let data = res.Tag[0].Table
-							this.priceStatus1 = data[0].count
-							this.priceStatus2 = data[2].count
-							this.priceStatus3 = data[1].count
+							this.priceStatus1 = data[0].count.toString()
+							this.priceStatus2 = data[2].count.toString()
+							this.priceStatus3 = data[1].count.toString()
 						} else {
-							this.priceStatus1 = 0
-							this.priceStatus2 = 0
-							this.priceStatus3 = 0
+							this.priceStatus1 = '0'
+							this.priceStatus2 = '0'
+							this.priceStatus3 = '0'
 						}
 					}
 				})

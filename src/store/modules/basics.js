@@ -12,8 +12,8 @@ const basics = {
     img_url_user_feedback_order: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/USER/ORDER_FEEDBACK/IMAGES/',  // 退货退款异常反馈图片文件夹
     img_url_user_idcard: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/USER/IDCARD/', // app用户实名认证图片文件夹
     file_url_addphone: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/GUIDE/WEB/ADDPHONE/EXCEL/',  // 增加人力资源上传文件文件夹
-    img_url_plate: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/PLATE/IMAGES/',  // 板块图片文件夹
-    file_url_plate: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/PLATE/FILES/',  // 板块文件文件夹
+    img_url_plate: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/APRC/PLATES/IMGS/',  // 板块图片文件夹
+    file_url_plate: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/APRC/PLATES/FILES/',  // 板块文件文件夹
     file_url_sign: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/ORG/SIGN/IMAGES/',  // 机构签约文件夹
     img_url_servicefee: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/SERVICEFEE/MN/IMAGES/', // 定价专员-按型号名称-定价说明图片上传文件夹
     img_url_idcard: process.env.VUE_APP_BASE_URL_ASSETS + '/Enclosure/WEBUSER/IDCARD/', // web用户实名认证图片文件夹

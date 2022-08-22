@@ -1,24 +1,26 @@
 <template>
-	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
-		<div class="title-bg">{{type=='1'?'符合供应范围的需求列表' : '系统推荐的需方需求'}}</div>
-		<div class="" style="padding-bottom: 60px;" v-loading="loading">
-			<div class="mb10" style="border-bottom: 1px solid #000;padding-bottom: 10px;" v-for="item in tableData" @click="toDetail">
-				<el-button type="danger" class="mb10" @click.stop="delItem(item)">删除</el-button>
-				<div class="category-item flex-center">
-					<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + row.categoryImg"></el-image>
-					<div class="flex jsb mr20" style="flex: 1; height: 100px;">
-						<div>
-							<div>{{row.categoryName}}</div>
-							<div>{{row.categoryAlias}}</div>
+	<el-dialog title=" " :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
+		<div style="padding-top: 20px;max-height: 800px;overflow-y: auto;">
+			<div class="title-bg">{{type=='1'?'符合供应范围的需求列表' : '系统推荐的需方需求'}}</div>
+			<div class="" style="padding-bottom: 60px;" v-loading="loading">
+				<div class="mb10" style="border-bottom: 1px solid #000;padding-bottom: 10px;" v-for="item in tableData" @click="toDetail(item)">
+					<el-button type="danger" class="mb10" @click.stop="delItem(item)">删除</el-button>
+					<div class="category-item flex-center">
+						<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + row.categoryImg"></el-image>
+						<div class="flex jsb mr20" style="flex: 1; height: 100px;">
+							<div>
+								<div>{{row.categoryName}}</div>
+								<div>{{row.categoryAlias}}</div>
+							</div>
+							<div style="display: flex;flex-direction:column-reverse;">日期：{{item.mtNeCreateTime}}</div>
 						</div>
-						<div style="display: flex;flex-direction:column-reverse;">日期：{{item.mtNeCreateTime}}</div>
+						<div class="el-icon-arrow-right" style="font-size: 36px;"></div>
 					</div>
-					<div class="el-icon-arrow-right" style="font-size: 36px;"></div>
 				</div>
 			</div>
+			<pages @changePage="changePage" :total="pageTotal" :page="page"></pages>
+			<demandDetail v-if="isDetail" @close='closeDetail' :row ='openRow' :category="row"></demandDetail>
 		</div>
-		<pages @changePage="changePage" :total="pageTotal" :page="page"></pages>
-		<demandDetail v-if="isDetail" @close='closeDetail' :row ='openRow' :category="row"></demandDetail>
 	</el-dialog>
 </template>
 
@@ -53,6 +55,7 @@
 				isDetail: false,
 				openRow: {},
 				basicImgUrl: this.$store.state.basics.img_url_cat,
+				tableData: []
 			};
 		},
 		methods: {
@@ -65,7 +68,7 @@
 			},
 			changePage(page) {
 				this.page = page
-				//
+				this.getListBySuPGuid()
 			},
 			toDetail(item) {
 				this.isDetail = true
@@ -86,10 +89,11 @@
 			},
 			async deleteDemand(matchNoticeGuid) {
 				await deleteDemand({
-					matchNoticeGuid: matchNoticeGuid
+					matchNoticeGuid: matchNoticeGuid,
+					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
 					if (res.OK == 'True') {
-						if (res.tag > 0) {
+						if (res.Tag[0] > 0) {
 							this.$message({
 								message: '操作成功!',
 								type: 'success'
@@ -111,7 +115,8 @@
 					recommedType: this.type,
 					size: '20',
 					curUserId: this.$store.state.user.adminId,
-					page: this.page
+					page: this.page,
+					categoryGuid: this.row.categoryGuid
 				}).then(res => {
 					this.loading = false
 					if(res.OK == 'True') {
@@ -127,7 +132,7 @@
 			}
 		},
 		created() {
-
+			this.getListBySuPGuid()
 		}
 	};
 </script>

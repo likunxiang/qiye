@@ -47,9 +47,8 @@ export function updatePlateFieldAlias(data) {
 
 // 新增id
 export function getNewId(data) {
-  axios.defaults.baseURL = '/api'
   return request({
-    url: '/guid?OnlyTagReturn=true&DBC=w_m',
+    url: '/guid?OnlyTagReturn=true&DBC=w_a',
     method: 'post',
     params: data
   })
@@ -95,12 +94,19 @@ export function getUploadResult_service(guid) {
   })
 }
 
+// 获取国家列表
+export function getNation(data) {
+  return request({
+    url: '/QueryData?SqlCmdName=aprc\\base\\getNation&DBC=w_a',
+    method: 'post',
+    data: data
+  })
+}
+
 // 获取省列表
 export function getProvince(data) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
-    url: '/QueryData?SqlCmdName=com\\getProvince&DBC=w_m',
+    url: '/QueryData?SqlCmdName=aprc\\base\\getProvince&DBC=w_a',
     method: 'post',
     data: data
   })
@@ -108,10 +114,8 @@ export function getProvince(data) {
 
 // 获取市列表
 export function getCity(data) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
-    url: '/QueryData?SqlCmdName=com\\getCity&DBC=w_m',
+    url: '/QueryData?SqlCmdName=aprc\\base\\getCity&DBC=w_a',
     method: 'post',
     data: data
   })
@@ -119,10 +123,17 @@ export function getCity(data) {
 
 // 获取县/区列表
 export function getCounty(data) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
-    url: '/QueryData?SqlCmdName=com\\getCounty&DBC=w_m',
+    url: '/QueryData?SqlCmdName=aprc\\base\\getCounty&DBC=w_a',
+    method: 'post',
+    data: data
+  })
+}
+
+// 获取街道/镇列表
+export function getTown(data) {
+  return request({
+    url: '/QueryData?SqlCmdName=aprc\\base\\getTown&DBC=w_a',
     method: 'post',
     data: data
   })
@@ -130,9 +141,7 @@ export function getCounty(data) {
 
 // 发送短信验证码接口
 export function web_SMS_Send(phonenumber,type) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
     url: '/ProxyService/SMS_Send?mobile=' + phonenumber + '&type=' + type,
     method: 'get',
   })
@@ -140,9 +149,7 @@ export function web_SMS_Send(phonenumber,type) {
 
 // 校验验证码是否正确
 export function web_SMS_validCode(phonenumber,code) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
     url: '/ProxyService/SMS_validCode?phonenumber=' + phonenumber + '&code=' + code,
     method: 'get',
   })
@@ -150,10 +157,8 @@ export function web_SMS_validCode(phonenumber,code) {
 
 // web-查询用户个人信息-根据用户id和用户角色
 export function getDetailByIdAndRK(data) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
-    url: '/QueryData?SqlCmdName=web\\user\\info\\getDetailByIdAndRK_1_0_1&DBC=w_m',
+    url: '/QueryData?SqlCmdName=web\\user\\info\\getDetailByIdAndRK_1_0_1&DBC=w_a',
     method: 'post',
     data: data
   })
@@ -176,5 +181,16 @@ export function getSonList(data) {
     data: data
   })
 }
+
+// web-查询固化库字段内容列表
+export function getByCode(data) {
+  return request({
+    url: '/QueryData?SqlCmdName=aprc\\webSuOrg\\model\\fdValues\\getByCode_1_0_1&DBC=w_a',
+    method: 'post',
+    data: data
+  })
+}
+
+
 
 

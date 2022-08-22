@@ -25,15 +25,15 @@
 		</div>
 		<div class="flex jsb">
 			<div>采购编号：{{orderDetailObj.orderNo}}</div>
-			<div>日期：{{orderDetailObj.orderCreateDate}}</div>
+			<div>日期：{{orderDetailObj.orderTime}}</div>
 		</div>
 		<div class="title-bg mb10 mt10">结算信息</div>
 		<el-descriptions :colon="false" class="margin-top" :column="1">
-			<el-descriptions-item label-class-name="my-label" label="应收金额：">{{orderDetailObj.shouldPayFee}}
+			<el-descriptions-item label-class-name="my-label" label="应收金额：">{{orderDetailObj.supplyFee}}
 			</el-descriptions-item>
 			<el-descriptions-item label-class-name="my-label" label="优惠金额：">{{orderDetailObj.discountFee}}
 			</el-descriptions-item>
-			<el-descriptions-item label-class-name="my-label" label="实收金额：">{{orderDetailObj.payFee}}
+			<el-descriptions-item label-class-name="my-label" label="实收金额：">{{orderDetailObj.orderFee}}
 			</el-descriptions-item>
 		</el-descriptions>
 		<div class="title-bg mb10 mt10">开票信息</div>
@@ -57,26 +57,26 @@
 			@close="beforeClosePurchaseDetail">
 			<div class="flex mb10">
 				<el-image class="mr10" style="width: 100px; height: 100px"
-					:src="imgBasicUrl + orderTypeDetail.categoryImg" :fit="fit"></el-image>
+					:src="imgBasicUrl + orderDetailObj.categoryImg" :fit="fit"></el-image>
 				<div>
-					<div>{{orderTypeDetail.categoryName}}</div>
-					<div>{{orderTypeDetail.categoryAlias}}</div>
+					<div>{{orderDetailObj.categoryName}}</div>
+					<div>{{orderDetailObj.categoryAlias}}</div>
 				</div>
 			</div>
 			<div class="flex jsb mb10">
-				<div>采购编号：{{orderTypeDetail.orderNo}}</div>
-				<div>日期：{{orderTypeDetail.orderCreateDate}}</div>
+				<div>采购编号：{{orderDetailObj.orderNo}}</div>
+				<div>日期：{{orderDetailObj.orderTime}}</div>
 			</div>
 			<div class="flex jsb ptb">
 				<div class="bold">供应主体</div>
 				<div class="flex flex-center" style="flex-shrink: 0;" @click="openMainDetail">
-					<div>{{orderTypeDetail.supplyCompanyName}}</div>
+					<div>{{orderDetailObj.supplyCompanyName}}</div>
 					<div class="el-icon-arrow-right" style="font-size: 20px;"></div>
 				</div>
 			</div>
 			<div class="flex jsb ptb">
 				<div class="bold">品牌名称</div>
-				<div>{{orderTypeDetail.brandName}}</div>
+				<div>{{orderDetailObj.brandName}}</div>
 			</div>
 			<div class="ptb">
 				<div class="bold mb10">采购费用</div>
@@ -93,25 +93,29 @@
 				@close="beforeClosePurchaseDetail">
 				<div class="flex mb10">
 					<el-image class="mr10" style="width: 100px; height: 100px"
-						:src="imgBasicUrl + orderTypeDetail.categoryImg" :fit="fit"></el-image>
+						:src="imgBasicUrl + orderDetailObj.categoryImg" :fit="fit"></el-image>
 					<div>
-						<div>{{orderTypeDetail.categoryName}}</div>
-						<div>{{orderTypeDetail.categoryAlias}}</div>
+						<div>{{orderDetailObj.categoryName}}</div>
+						<div>{{orderDetailObj.categoryAlias}}</div>
 					</div>
 				</div>
 				<div class="flex jsb mb10">
-					<div>采购编号：{{orderTypeDetail.orderNo}}</div>
-					<div>日期：{{orderTypeDetail.orderCreateDate}}</div>
+					<div>采购编号：{{orderDetailObj.orderNo}}</div>
+					<div>日期：{{orderDetailObj.orderTime}}</div>
 				</div>
-				<el-tabs v-model="activeMain" type="card">
+				<el-tabs v-model="activeMain" type="card" @tab-click="changeMain">
 					<el-tab-pane label="需求信息" name="first">
 						<div class="" style="padding-bottom: 40px;">
-							<demandMessage :orderGuid='openRow.orderGuid' v-if="activeMain=='first'"></demandMessage>
+							<div v-if="activeMain=='first'">
+								<plateModel v-if="isLoading" :plateData="plateArr"></plateModel>
+							</div>
+				
 						</div>
-					</el-tab-pane>
+				 </el-tab-pane>
 					<el-tab-pane label="供应信息" name="second">
 						<div class="" style="padding-bottom: 40px;">
-							<supplyMessage :orderGuid='openRow.orderGuid' v-if="activeMain=='second'"></supplyMessage>
+							<supplyMessage :supplyObj="supplyOfferObj" v-if="activeMain=='second' && isLoading"></supplyMessage>
+				
 						</div>
 					</el-tab-pane>
 				</el-tabs>
@@ -121,7 +125,7 @@
 		<el-dialog title="物流进度" width="900px" :visible.sync="isLogistics" append-to-body destroy-on-close
 			@close="beforeCloseLogistics">
 			<div class="flex mb10">
-				<el-image class="mr10" style="width: 100px; height: 100px" :src="url" :fit="fit"></el-image>
+				<el-image class="mr10" style="width: 100px; height: 100px" ></el-image>
 				<div>
 					<div>品类名称</div>
 					<div>别名1、别名2</div>
@@ -142,9 +146,9 @@
 </template>
 
 <script>
+	import plateModel from "@/views/supplyRange/components/plateModel"
+	import supplyMessage from '@/views/supplyOffer/components/supplyMessage.vue'
 	import {
-		getDemandDetail,
-		getSupplyDetail,
 		getOrderFeeDemandDetail,
 		getOrderFeeSupplyDetail,
 		getDemandMessage,
@@ -154,13 +158,16 @@
 		getWaitHandleList,
 		getOrderDetail
 	} from '@/api/orderSupplyApi/orderSupply.js'
-	import demandMessage from '@/views/arbitrationRole/ReturnOfRuling/components/demandMessage.vue'
-	import supplyMessage from '@/views/arbitrationRole/ReturnOfRuling/components/supplyMessage.vue'
+	import {
+		getDemandDetail,
+	} from '@/api/demandReceiveApi/demandReceive.js'
+	import {
+		getOfferCase
+	} from '@/api/supplyOfferApi/supplyOffer.js'
 	export default {
 		name: "index",
 		components: {
-			demandMessage,
-			supplyMessage
+			plateModel,supplyMessage
 		},
 		props: {
 			openRow: {
@@ -210,23 +217,33 @@
 					type: '物流费用',
 					price: '*'
 				}],
-				url: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
 				fit: 'fit',
 				activeMain: 'first',
-				imgBasicUrl: this.$store.state.basics.img_url_cat
+				imgBasicUrl: this.$store.state.basics.img_url_cat,
+				isLoading: false,
+				plateArr: [],
+				supplyOfferObj: {}
 
 			};
 		},
 		created() {
 			console.log(this.openRow);
-			if (this.orderType == 'demand') {
-				this.getOrderDetail()
-			} else {
-				this.getSupplyDetail()
-			}
+			this.getOrderDetail()
+			// if (this.orderType == 'demand') {
+			// 	this.getOrderDetail()
+			// } else {
+			// 	this.getSupplyDetail()
+			// }
 
 		},
 		methods: {
+			changeMain(tab, event) {
+			  if (this.activeMain == 'first') {
+			  	this.getDemandDetail()
+			  } else {
+			  	this.getOfferCase()
+			  }
+			},
 			// 获取订单内容
 			async getOrderDetail() {
 				await getOrderDetail({
@@ -235,6 +252,45 @@
 				}).then(res => {
 					let data = res.Tag[0].Table[0]
 					this.orderDetailObj = data
+					this.orderTypeDetailFree[0].price = data.orderFee
+					this.orderTypeDetailFree[1].price = data.serviceFee
+					this.orderTypeDetailFree[2].price = data.taxFee
+					this.orderTypeDetailFree[3].price = data.logisticsFee
+				})
+			},
+			// 获取报价信息
+			async getOfferCase() {
+				this.isLoading = false
+				await getOfferCase({
+					requestPriceGuid: this.orderDetailObj.requestPriceGuid,
+					curUserId: this.$store.state.user.adminId,
+				}).then(res => {
+					this.isLoading = true
+					if (res.OK == 'True') {
+						if (res.Tag.length) {
+							let data = res.Tag[0].Table[0]
+							this.supplyOfferObj = data
+						} else {
+							this.plateArr = {}
+						}
+					}
+				})
+			},
+			async getDemandDetail() {
+				this.isLoading = false
+				await getDemandDetail({
+					requestGuid: this.orderDetailObj.requestGuid,
+					curUserId: this.$store.state.user.adminId,
+				}).then(res => {
+					this.isLoading = true
+					if (res.OK == 'True') {
+						if (res.Tag.length) {
+							let data = res.Tag[0].Table
+							this.plateArr = data
+						} else {
+							this.plateArr = []
+						}
+					}
 				})
 			},
 			// 获取订单内容
@@ -272,22 +328,6 @@
 					this.orderTypeDetailFree[3].price = data.logisticsFee
 				})
 			},
-			// 需求信息
-			async getDemandMessage() {
-				await getDemandMessage({
-					orderGuid: this.openRow.orderGuid
-				}).then(res => {
-
-				})
-			},
-			// 供应信息
-			async getSupplydMessage() {
-				await getSupplydMessage({
-					orderGuid: this.openRow.orderGuid
-				}).then(res => {
-
-				})
-			},
 			closeOrderDetail() {
 				this.isOrderDetail = false
 				this.$emit('close')
@@ -298,11 +338,6 @@
 			openPurchaseDetail(row) {
 				this.orderRow = row
 				this.isPurchaseDetail = true
-				if (this.orderType == 'demand') {
-					this.getOrderFeeDemandDetail()
-				} else {
-					this.getOrderFeeSupplyDetail()
-				}
 			},
 			closePurchaseDetail() {
 				this.isPurchaseDetail = false
@@ -321,6 +356,11 @@
 			},
 			openMainDetail() {
 				this.isMain = true
+				if (this.activeMain == 'first') {
+					this.getDemandDetail()
+				} else {
+					this.getOfferCase()
+				}
 			},
 			closeMainDetail() {
 				this.isMain = false

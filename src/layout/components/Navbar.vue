@@ -2,44 +2,51 @@
 	<div class="navbar">
 		<hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container"
 			@toggleClick="toggleSideBar" />
-		<div class="hamburger-container" @click="changeProject">切换合作项目</div>
+		<div class="flex jsb">
+			<div class="flex ">
+				<div class="mr10 hamburger-container" v-if="choosedProject">【{{choosedProject}}】</div>
+				<div class="hamburger-container" @click="changeProject" @getData="getChoosedProject">切换合作项目</div>
+				<breadcrumb id="breadcrumb-container" class="breadcrumb-container" v-if="!topNav" />
+				<top-nav id="topmenu-container" class="topmenu-container" v-if="topNav" />
+			</div>
+			<div class="right-menu">
+				<template v-if="device!=='mobile'">
+					<search id="header-search" class="right-menu-item" />
+			
+			
+			
+					<screenfull id="screenfull" class="right-menu-item hover-effect" />
+			
+					<el-tooltip content="布局大小" effect="dark" placement="bottom">
+						<size-select id="size-select" class="right-menu-item hover-effect" />
+					</el-tooltip>
+			
+				</template>
+			
+				<el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
+					<div class="avatar-wrapper">
+						<img :src="avatar" class="user-avatar">
+						<i class="el-icon-caret-bottom" />
+					</div>
+					<el-dropdown-menu slot="dropdown">
+						<router-link to="/user/profile">
+							<el-dropdown-item>个人中心</el-dropdown-item>
+						</router-link>
+						<el-dropdown-item @click.native="setting = true">
+							<span>布局设置</span>
+						</el-dropdown-item>
+						<el-dropdown-item divided @click.native="logout">
+							<span>退出登录</span>
+						</el-dropdown-item>
+					</el-dropdown-menu>
+				</el-dropdown>
+			</div>
+		</div>
 		<!-- 切换合作项目弹窗 -->
 		<changeProject v-if="isChange" @close='closeChangeProject'></changeProject>
-		<breadcrumb id="breadcrumb-container" class="breadcrumb-container" v-if="!topNav" />
-		<top-nav id="topmenu-container" class="topmenu-container" v-if="topNav" />
+		
 
-		<div class="right-menu">
-			<template v-if="device!=='mobile'">
-				<search id="header-search" class="right-menu-item" />
-
-
-
-				<screenfull id="screenfull" class="right-menu-item hover-effect" />
-
-				<el-tooltip content="布局大小" effect="dark" placement="bottom">
-					<size-select id="size-select" class="right-menu-item hover-effect" />
-				</el-tooltip>
-
-			</template>
-
-			<el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
-				<div class="avatar-wrapper">
-					<img :src="avatar" class="user-avatar">
-					<i class="el-icon-caret-bottom" />
-				</div>
-				<el-dropdown-menu slot="dropdown">
-					<router-link to="/user/profile">
-						<el-dropdown-item>个人中心</el-dropdown-item>
-					</router-link>
-					<el-dropdown-item @click.native="setting = true">
-						<span>布局设置</span>
-					</el-dropdown-item>
-					<el-dropdown-item divided @click.native="logout">
-						<span>退出登录</span>
-					</el-dropdown-item>
-				</el-dropdown-menu>
-			</el-dropdown>
-		</div>
+		
 	</div>
 </template>
 
@@ -94,11 +101,15 @@
 		data() {
 			return {
 				isChange: false,
+				choosedProject: this.$store.state.user.projectId.treeTitleString1,
 			};
 		},
 		methods: {
 			changeProject() {
 				this.isChange = true
+			},
+			getChoosedProject(data) {
+				this.choosedProject = data
 			},
 			closeChangeProject() {
 				this.isChange = false

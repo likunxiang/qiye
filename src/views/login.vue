@@ -1,7 +1,7 @@
 <template>
 	<div class="login">
 		<el-form ref="loginForm" :model="loginForm" label-position="left" :rules="loginRules" class="login-form">
-			<h3 class="title">企业供应管理系统</h3>
+			<h3 class="title">机构供应管理系统</h3>
 			<el-form-item prop="phonenumber">
 				<el-input v-model="loginForm.phonenumber" type="text" auto-complete="off" placeholder="手机号">
 					<svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -11,7 +11,8 @@
 				<el-input v-model="loginForm.code" type="text" auto-complete="off" placeholder="验证码">
 					<svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
 					<el-button slot="suffix" type="button" class="yan" :disabled="disabled" @click="getMyCode()">
-						{{codeText}}</el-button>
+						{{codeText}}
+					</el-button>
 				</el-input>
 			</el-form-item>
 
@@ -51,15 +52,15 @@
 		name: "Login",
 		data() {
 			return {
-				pageType: 'register',  // 'register' 注册    'login' 登录
+				pageType: 'register', // 'register' 注册    'login' 登录
 				codeText: "获取验证码",
 				disabled: false,
 				codeUrl: "",
 				cookiePassword: "",
 				loginForm: {
 					// userName: '',
-					phonenumber: '17746071523',
-					code: '251483',
+					phonenumber: '',
+					code: '',
 				},
 				loginRules: {
 					phonenumber: [{
@@ -89,69 +90,72 @@
 				immediate: true
 			}
 		},
-		created() {
-		},
+		created() {},
 		methods: {
-			
+
 			//获取验证码--按钮
 			getMyCode() {
-			  if (this.loginForm.phonenumber == "") {
-			    this.$message.error("手机号不得为空");
-			  } else {
-			    let maxNum = 60;
-			    let oldCodeText = this.codeText;
-			    this.codeText = `${maxNum}s重新发送`; //初始显示倒计时
-			    this.disabled = true;
-			    this.sendCode(2)
-			    let codeCountDown = setInterval(() => {
-			
-			      let countDownNum = maxNum--;
-			      this.codeText = `${countDownNum}s重新发送`;
-			      if (countDownNum == 0) {
-			        //倒计时结束
-			        this.codeText = oldCodeText;
-			        clearInterval(codeCountDown);
-			        this.disabled = false;
-			      }
-			    }, 1000);
-			  }
+				if (this.loginForm.phonenumber == "") {
+					this.$message.error("手机号不得为空");
+				} else {
+					this.sendCode(2)
+
+				}
 			},
 			// 发送验证码
 			async sendCode(type) {
-			  let phone = this.loginForm.phonenumber
-			  await getCode(phone,type).then(res => {
-			    console.log(res);
-			  })
+				let phone = this.loginForm.phonenumber
+				await getCode(phone, type).then(res => {
+					if (res.OK == 'True') {
+						let maxNum = 60;
+						let oldCodeText = this.codeText;
+						this.codeText = `${maxNum}s重新发送`; //初始显示倒计时
+						this.disabled = true;
+
+						let codeCountDown = setInterval(() => {
+
+							let countDownNum = maxNum--;
+							this.codeText = `${countDownNum}s重新发送`;
+							if (countDownNum == 0) {
+								//倒计时结束
+								this.codeText = oldCodeText;
+								clearInterval(codeCountDown);
+								this.disabled = false;
+							}
+						}, 1000);
+					}
+				})
 			},
 			// 校验验证码是否正确
 			async checkCode() {
-			  let phone = this.loginForm.phonenumber
-			  let code = this.loginForm.code
-			  await verifyCode(phone,code).then(res => {
-			    console.log(res);
-			    if(res.OK == 'True') {
-			      if (res.Tag > 0) {
-			        this.$store.dispatch("Login", this.loginForm).then(() => {
-						console.log('登录成功',this.redirect);
-						
-						this.$router.push({ path: this.redirect || "/" }).catch((err)=>{
-							console.log('跳转失败','err');
-							return
-						});
-			        }).catch(() => {
-			        	this.loading = false;
-						console.log('失败这里？');
-			        });
-			      } else {
-			        this.$message({
-			          message: '验证码错误',
-			          type: 'error'
-			        });
-			      }
-			    }
-			  })
+				let phone = this.loginForm.phonenumber
+				let code = this.loginForm.code
+				await verifyCode(phone, code).then(res => {
+					console.log(res);
+					if (res.OK == 'True') {
+						if (res.Tag > 0) {
+							this.$store.dispatch("Login", this.loginForm).then(() => {
+
+								this.$router.push({
+									path: this.redirect || "/"
+								}).catch((err) => {
+									console.log('跳转失败', 'err');
+									return
+								});
+							}).catch(() => {
+								this.loading = false;
+							});
+						} else {
+							this.$message({
+								message: '验证码错误',
+								type: 'error'
+							});
+							this.loading = false;
+						}
+					}
+				})
 			},
-			
+
 			handleLogin() {
 				this.$refs.loginForm.validate(valid => {
 					if (valid) {

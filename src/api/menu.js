@@ -4,7 +4,7 @@ import request from '@/utils/request'
 export const getRouters = () => {
 	return request({
 		// url: '/system/menu/getRouters',
-		url: '/ProxyService/aprc_web_menu_getRouters',
+		url: '/ProxyService/aprc_webSuOrg_menu_getRouters',
 		method: 'get'
 	})
 }

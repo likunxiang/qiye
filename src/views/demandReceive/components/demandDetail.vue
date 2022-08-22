@@ -1,26 +1,29 @@
 <template>
-	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose">
-		<div class="">
-			<div class="mb10" style="padding-bottom: 10px;">
-				<div class="category-item flex-center">
-					<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + category.categoryImg"></el-image>
-					<div class="flex jsb mr20" style="flex: 1; height: 100px;">
-						<div>
-							<div>{{category.categoryName}}</div>
-							<div>{{category.categoryAlias}}</div>
-						</div>
-						<div style="display: flex;flex-direction:column-reverse;">日期：{{category.mtNeCreateTime}}</div>
+	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
+		<div class="" style="padding-top: 20px;">
+			<div class=" mb10" style="padding-bottom: 10px;">
+			<div class="category-item flex flex-center">
+				<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + category.categoryImg">
+				</el-image>
+				<div class="flex jsb mr20" style="flex: 1; height: 100px;">
+					<div>
+						<div>{{category.categoryName}}</div>
+						<div>{{category.categoryAlias}}</div>
 					</div>
+					<div style="display: flex;flex-direction:column-reverse;">日期：{{row.mtNeCreateTime}}</div>
 				</div>
 			</div>
-			<plateModel :plateData="plateArr"></plateModel>
+		</div>
+		<plateModel v-if="isLoading" :plateData="plateArr"></plateModel>
 		</div>
 	</el-dialog>
 </template>
 
 <script>
 	import plateModel from "@/views/supplyRange/components/plateModel"
-	import { getDemandDetail } from '@/api/demandReceiveApi/demandReceive.js'
+	import {
+		getDemandDetail
+	} from '@/api/demandReceiveApi/demandReceive.js'
 	export default {
 		name: "index",
 		components: {
@@ -45,6 +48,7 @@
 				isOpen: true,
 				plateArr: [],
 				basicImgUrl: this.$store.state.basics.img_url_cat,
+				isLoading: false,
 			};
 		},
 		methods: {
@@ -55,12 +59,13 @@
 			beforeClose() {
 				this.close()
 			},
-			// web-供应-按单-查询供方需求范围内容
 			async getDemandDetail() {
+				this.isLoading = false
 				await getDemandDetail({
 					requestGuid: this.row.requestGuid,
 					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
+					this.isLoading = true
 					if (res.OK == 'True') {
 						if (res.Tag.length) {
 							let data = res.Tag[0].Table
@@ -73,7 +78,8 @@
 			},
 		},
 		created() {
-
+			console.log(this.row);
+			this.getDemandDetail()
 		}
 	};
 </script>

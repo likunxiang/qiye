@@ -1,7 +1,8 @@
 import Vue from 'vue'
+import Axios from 'axios'
 
 import Cookies from 'js-cookie'
-
+import * as VueJsonp from 'vue-jsonp'
 import Element from 'element-ui'
 import './assets/styles/element-variables.scss'
 
@@ -81,6 +82,8 @@ Vue.use(directive)
 Vue.use(plugins)
 Vue.use(VueMeta)
 DictData.install()
+
+Vue.prototype.$axios = Axios;
 
 /**
  * If you don't want to use mock-server

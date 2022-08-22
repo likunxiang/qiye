@@ -1,24 +1,29 @@
 <template>
 	<div class="app-container">
-		<div class="title-bg">供应交接管理(9)</div>
-		<div class="mb10" style="border-bottom: 1px solid #999;padding-bottom: 10px;" v-for="item in tableData"
-			@click="toOrderDetail(item)">
-			<div class="category-item flex-center">
-				<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + row.categoryImg"></el-image>
-				<div class="flex jsb mr20" style="flex: 1; height: 100px;">
-					<div>
-						<div>{{item.categoryName}}</div>
-						<div>{{item.categoryAlias}}</div>
+		<div class="title-bg">供应交接管理</div>
+		<template v-if="tableData.length > 0">
+			<div class="mb10" style="border-bottom: 1px solid #999;padding-bottom: 10px;" v-for="item in tableData"
+				@click="toOrderDetail(item)">
+				<div class="category-item flex-center">
+					<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + item.categoryImg"></el-image>
+					<div class="flex jsb mr20" style="flex: 1; height: 100px;">
+						<div>
+							<div>{{item.categoryName}}</div>
+							<div>{{item.categoryAlias}}</div>
+						</div>
+			
 					</div>
-
+					<div class="el-icon-arrow-right" style="font-size: 36px;"></div>
 				</div>
-				<div class="el-icon-arrow-right" style="font-size: 36px;"></div>
+				<div class="flex flex-center jsb">
+					<div>采购编号：{{item.orderNo}}</div>
+					<div>日期：{{item.orderTime}}</div>
+				</div>
 			</div>
-			<div class="flex flex-center jsb">
-				<div>采购编号：{{item.orderNo}}</div>
-				<div>日期：{{item.orderTime}}</div>
-			</div>
-		</div>
+		</template>
+		<template v-else>
+			<el-empty description="暂无数据"></el-empty>
+		</template>
 		<pages @changePage="changePage" :total="pageTotal" :page="page"></pages>
 		<orderDetail v-if="isSupplyOrder" @close="closeSupplyOrder" :openRow="openRow" orderType="supply"></orderDetail>
 	</div>
@@ -76,11 +81,12 @@
 							this.pageTotal = (this.page - 1) * 20 + 1
 						}
 					}
+					console.log(this.tableData);
 				})
 			}
 		},
 		created() {
-
+			this.getWaitHandleList()
 		}
 	}
 </script>

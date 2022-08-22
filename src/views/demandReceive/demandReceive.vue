@@ -5,8 +5,7 @@
 			<el-table-column prop="categoryName" label="品类名称" align="center"></el-table-column>
 			<el-table-column prop="image" label="品类图片" align="center">
 				<template slot-scope="scope">
-					<el-image style="width: 100px; height: 100px" :src="basicImgUrl + scope.row.categoryImg" fit="fill">
-					</el-image>
+					<el-image style="width: 100px; height: 100px" :src="basicImgUrl + scope.row.categoryImg" fit="fill"></el-image>
 				</template>
 			</el-table-column>
 			<el-table-column label="操作" align="center">

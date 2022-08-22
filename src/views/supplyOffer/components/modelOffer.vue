@@ -1,9 +1,10 @@
 <template>
 	<el-dialog title="" :visible.sync="isOpen" width="900px" @close="beforeClose">
-		<div class="" style="padding-bottom: 60px;">
+		<div class="" style="padding-bottom: 60px;padding-top: 20px;">
 			<div style="width: 100%;" class="flex flex-center jsb mb20">
 				<div class="flex">
-					<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + row.categoryImg"></el-image>
+					<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + row.categoryImg">
+					</el-image>
 					<div>
 						<div>{{row.categoryName}}</div>
 						<div>{{row.categoryalias}}</div>
@@ -24,22 +25,25 @@
 					<div v-if="isToSearch" class="ml0">搜索结果: {{searchResult}}</div>
 				</div>
 			</div>
-			<el-table :data="modelData" border>
+			<el-table :data="modelData" border :row-class-name="tableRowClassName">
 				<el-table-column prop="modelName" label="型号名称" align="center"></el-table-column>
 				<el-table-column prop="salesUnit" label="销售单位" align="center"></el-table-column>
 				<el-table-column prop="price" label="价格" align="center"></el-table-column>
 				<el-table-column label="操作" align="center">
 					<template slot-scope="scope">
-						<div class="flex">
-							<el-button type="text" @click="toOffer(scope.row)">型号价格管理</el-button>
-							<el-button type="text" @click="statusChange(scope.row, '1')" v-if="!scope.row.up">型号上架接单
+							<el-button type="text" @click="toOffer(scope.row)"
+								:disabled="!scope.row.salesUnit" v-if="scope.row.salesOnFlag=='0'">型号价格管理</el-button>
+							<el-button type="text" @click="statusChange(scope.row, '1')"
+								v-if="scope.row.salesOnFlag=='0'" :disabled="!scope.row.salesUnit || !scope.row.price">
+								型号上架接单
 							</el-button>
-							<el-button type="text" @click="statusChange(scope.row, '2')" v-else>型号下架接单</el-button>
-						</div>
+							<el-button type="text" @click="statusChange(scope.row, '2')" v-else
+								:disabled="!scope.row.salesUnit || !scope.row.price">型号下架接单</el-button>
 					</template>
 				</el-table-column>
 			</el-table>
-			<modelOfferDetail v-if="isOffer" @close="closeOffer" :row="openRow"></modelOfferDetail>
+			<modelOfferDetail v-if="isOffer" @close="closeOffer" :catogoryObj='row' :row="openRow"
+				@refresh='getPriceList' offerType="model"></modelOfferDetail>
 			<pages @changePage="changePage" :total="pageTotal" :page="page"></pages>
 		</div>
 	</el-dialog>
@@ -49,7 +53,10 @@
 	import pages from '@/views/components/common/pages'
 	import modelOfferDetail from '@/views/supplyOffer/components/modelOfferDetail'
 	import {
-		getPriceList,isCanSales,updSalesOn,updSalesOff
+		getPriceList,
+		isCanSales,
+		updSalesOn,
+		updSalesOff
 	} from '@/api/supplyOfferApi/supplyOffer.js'
 	export default {
 		name: "index",
@@ -80,9 +87,23 @@
 			};
 		},
 		methods: {
+			tableRowClassName({
+				row,
+				rowIndex
+			}) {
+				console.log(row);
+				if (row.valueStatus === '0') {
+					return 'warning-row'
+				} else {
+					return ''
+				}
+			},
 			changePage(page) {
 				this.page = page
 				//
+			},
+			clearSearch() {
+				this.searchVal = ''
 			},
 			toOffer(row) {
 				this.isOffer = true
@@ -91,9 +112,9 @@
 			closeOffer() {
 				this.isOffer = false
 			},
-			statusChange(row,status) {
+			statusChange(row, status) {
 				// TODO 库存为0自动下架
-				if(status == '1') {
+				if (status == '1') {
 					// 上架
 					if (!row.salesUnit) {
 						this.$alert('型号价目表中没有【销售单位】的内容，交易信息不完整，请向系统反馈。', '', {
@@ -112,8 +133,7 @@
 							type: 'warning'
 						}).then(() => {
 							this.updSalesOn(row.modelPriceGuid)
-						}).catch(() => {
-						});
+						}).catch(() => {});
 					}
 				} else {
 					// 下架
@@ -123,10 +143,9 @@
 						type: 'warning'
 					}).then(() => {
 						this.updSalesOff(row.modelPriceGuid)
-					}).catch(() => {
-					});
+					}).catch(() => {});
 				}
-				
+
 			},
 			searchClass() {
 				if (this.searchVal.length > 0) {
@@ -150,7 +169,7 @@
 					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
 					this.loading = false
-					if(res.OK == 'True') {
+					if (res.OK == 'True') {
 						if (res.Tag.length) {
 							this.modelData = res.Tag[0].Table
 							this.pageTotal = (this.page - 1) * 20 + 21
@@ -166,9 +185,9 @@
 					modelPriceGuid: modelPriceGuid,
 					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
-					if(res.OK == 'True') {
+					if (res.OK == 'True') {
 						let canSales = res.Tag[0].canSales
-						if(canSales == 0) {
+						if (canSales == 0) {
 							this.$alert('型号价目表中没有【价格】的内容，交易信息不完整，请向系统反馈。', '', {
 								confirmButtonText: '知道了',
 								callback: action => {}
@@ -226,5 +245,9 @@
 	};
 </script>
 
-<style lang="scss" scoped>
+<style>
+	.warning-row {
+		background: #D9001B !important;
+	}
+
 </style>

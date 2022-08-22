@@ -174,7 +174,9 @@ const user = {
 			state
 		}) {
 			return new Promise((resolve, reject) => {
-				logout(state.token).then(() => {
+				logout({
+					curUserId: state.adminId
+				}).then(() => {
 					commit('SET_TOKEN', '')
 					commit('SET_ADMINID', '')
 					commit('SET_DEPTID', '')

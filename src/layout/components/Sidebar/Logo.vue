@@ -34,7 +34,7 @@ export default {
   },
   data() {
     return {
-      title: '企业供应管理系统',
+      title: '机构供应管理系统',
       logo: logoImg
     }
   }

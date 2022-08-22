@@ -22,7 +22,7 @@ export function getRangeFlag(data) {
 // web-供应-开启需求范围
 export function updateRangeFlagOn(data) {
   return request({
-    url: '/QuerData?SqlCmdName=aprc\\webSuOrg\\supplier\\info\\updateRangeFlagOn_1_0_1&DBC=w_a',
+    url: '/QueryData?SqlCmdName=aprc\\webSuOrg\\supplier\\info\\updateRangeFlagOn_1_0_1&DBC=w_a',
     method: 'post',
     data: data
   })
@@ -31,7 +31,7 @@ export function updateRangeFlagOn(data) {
 // web-供应-关闭需求范围
 export function updateRangeFlagOff(data) {
   return request({
-    url: '/QuerData?SqlCmdName=aprc\\webSuOrg\\supplier\\info\\updateRangeFlagOff_1_0_1&DBC=w_a',
+    url: '/QueryData?SqlCmdName=aprc\\webSuOrg\\supplier\\info\\updateRangeFlagOff_1_0_1&DBC=w_a',
     method: 'post',
     data: data
   })

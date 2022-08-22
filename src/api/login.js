@@ -104,8 +104,8 @@ export function getInfo() {
 export function logout() {
 	return request({
 		// url: '/auth/logout',
-		url: '/ProxyService/aprc_web_logout',
-		method: 'delete'
+		url: '/ProxyService/aprc_webSuOrg_auth_logout_1_0_1',
+		method: 'post'
 	})
 }
 

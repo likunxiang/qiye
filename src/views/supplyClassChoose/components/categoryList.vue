@@ -1,6 +1,6 @@
 <template>
-	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose">
-		<div style="padding-bottom: 60px;">
+	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
+		<div style="padding-bottom: 60px;max-height: 80vh;overflow-y: auto;padding-top: 20px;">
 			<div class="flex flex-center mb20">
 				<div style="width: 100px;font-weight: bold;">需求场景</div>
 				<div>{{sreenObj.name}}</div>
@@ -32,6 +32,7 @@
 	import {
 		getSuCatListBySecenGuid,
 		addCat,
+		addSupplyNMT
 	} from '@/api/supplyClassChooseApi/supplyClassChoose.js'
 	import pages from '@/views/components/common/pages.vue'
 	import chooseByteTitle from './chooseByteTitle.vue'
@@ -68,6 +69,7 @@
 			getByteGuid(data) {
 			  this.guidList = data
 			  console.log('guidList',this.guidList);
+			  this.toSearch()
 			},
 			toSearch() {
 			  this.loading = true
@@ -116,11 +118,12 @@
 					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
 					if(res.OK == 'True') {
-						if (res.Tag[0] > 0) {
+						if (res.Tag.length) {
 						  this.$message({
 						    type: 'success',
 						    message: '操作成功!'
 						  });
+						  this.addSupplyNMT(item,res.Tag[0].Table[0].supplierGuid)
 						  this.getSuCatListBySecenGuid()
 						} else {
 						  this.$message({
@@ -129,6 +132,15 @@
 						  });
 						}
 					}
+				})
+			},
+			async addSupplyNMT(item,supplierGuid) {
+				await addSupplyNMT({
+					categoryGuid: item.categoryGuid,
+					supplierGuid: supplierGuid,
+					curUserId: this.$store.state.user.adminId,
+				}).then(res => {
+					
 				})
 			},
 			checkLimited(item) {
@@ -143,7 +155,7 @@
 			},
 		},
 		created() {
-			this.getSuCatListBySecenGuid()
+			// this.getSuCatListBySecenGuid()
 		}
 	};
 </script>
