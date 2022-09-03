@@ -14,9 +14,7 @@ export function getJudgeResult(data) {
 
 // 上传图片
 export function upLoadImgApi(data,FileName,FilePath) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
     url: '/UpLoadFile?FileName=' + FileName +'&FilePath=' + FilePath,
     method: 'post',
     data: data
@@ -56,9 +54,7 @@ export function getNewId(data) {
 
 // 获取上传进度
 export function getFileProgress(guid) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
     url: '/Cache?Name=GuideFileProgress&Key=' + guid,
     method: 'get',
   })
@@ -66,9 +62,7 @@ export function getFileProgress(guid) {
 
 // 获取上传结果
 export function getUploadResult(guid) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
     url: '/Cache?Name=GuideFileHandleNum&Key=' + guid,
     method: 'get',
   })
@@ -76,9 +70,7 @@ export function getUploadResult(guid) {
 
 // 获取上传进度--批量新建服务对象
 export function getFileProgress_service(guid) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
     url: '/Cache?Name=GuidanceNMFileProgress&Key=' + guid,
     method: 'get',
   })
@@ -86,9 +78,7 @@ export function getFileProgress_service(guid) {
 
 // 获取上传结果--批量新建服务对象
 export function getUploadResult_service(guid) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
     url: '/Cache?Name=GuidanceNMFileHandleNum&Key=' + guid,
     method: 'get',
   })

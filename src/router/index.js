@@ -154,7 +154,88 @@ export const constantRoutes = [{
 					title: '供应交接管理',
 					icon: '#',
 				}
+			},{
+				path: 'refundHandover',
+				component: (resolve) => require(['@/views/orderSupply/resultsHandover/refundHandover'], resolve),
+				name: 'RefundHandover',
+				meta: {
+					title: '退货交接管理',
+					icon: '#',
+				}
 			}]
+		}, {
+			path: 'orderStatus',
+			component: (resolve) => require(['@/views/orderSupply/orderStatus/orderStatus'], resolve),
+			name: 'OrderStatus',
+			meta: {
+				title: '订单状态管理',
+				icon: '#',
+			},
+		}]
+	},
+	{
+		path: '',
+		component: Layout,
+		redirect: 'index',
+		alwaysShow: true,
+		meta: {
+			title: '供应结算管理',
+			icon: '#',
+		},
+		children: [{
+			path: 'verifySettle',
+			component: (resolve) => require(['@/views/supplySettle/verifySettle/verifySettle'], resolve),
+			name: 'VerifySettle',
+			meta: {
+				title: '验收通过结算',
+				icon: '#',
+			}
+		},{
+			path: 'defaultCost',
+			component: (resolve) => require(['@/views/supplySettle/defaultCost/defaultCost'], resolve),
+			name: 'DefaultCost',
+			meta: {
+				title: '违约费用缴纳',
+				icon: '#',
+			}
+		},{
+			path: 'tradingCompensation',
+			component: (resolve) => require(['@/views/supplySettle/tradingCompensation/tradingCompensation'], resolve),
+			name: 'TradingCompensation',
+			meta: {
+				title: '交易赔偿办理',
+				icon: '#',
+			}
+		}]
+	},
+	{
+		path: '',
+		component: Layout,
+		hidden: true,
+		redirect: 'noredirect',
+		children: [{
+			path: 'usageFeedback',
+			component: (resolve) => require(['@/views/system/usageFeedback/index'], resolve),
+			name: 'UsageFeedback',
+			meta: {
+				title: '使用反馈',
+				icon: 'user'
+			}
+		}]
+	},
+	{
+		path: '',
+		component: Layout,
+		hidden: true,
+		redirect: 'noredirect',
+		children: [{
+			path: 'noticeSystem',
+			component: (resolve) => require(['@/views/system/noticeSystem/index'], resolve),
+			name: 'NoticeSystem',
+			meta: {
+				title: '消息通知',
+				icon: 'user'
+			}
 		}]
 	},
 	{

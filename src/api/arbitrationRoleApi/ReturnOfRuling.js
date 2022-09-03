@@ -69,10 +69,8 @@ export function getRefundOrderDetail(data) {
 
 // web-查询订单成果接收
 export function getOutcomeDetails(data) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
-    url: '/QueryData?SqlCmdName=WEB\\order\\getOrderCatInfo,WEB\\order\\getOutcomeDetails,WEB\\order\\getOutcomeDetailData&DBC=w_m',
+    url: '/QueryData?SqlCmdName=aprc\\web\\order\\getOrderCatInfo_1_0_1,aprc\\web\\order\\getOutcomeDetails_1_0_1,aprc\\web\\order\\getOutcomeDetailData_1_0_1&DBC=w_a',
     method: 'post',
     data: data
   })

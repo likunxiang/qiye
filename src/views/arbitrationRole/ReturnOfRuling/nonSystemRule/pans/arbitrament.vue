@@ -119,7 +119,8 @@
         await getNonSysJudgeList({
           orderNo: this.searchVal,
           size: '20',
-          page: this.page
+          page: this.page,
+		  curUserId: this.$store.state.user.adminId,
         }).then(res => {
 		  this.loading = false
           if (res.Tag.length) {

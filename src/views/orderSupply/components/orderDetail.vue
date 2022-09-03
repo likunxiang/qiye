@@ -194,13 +194,13 @@
 					price: ''
 				}, {
 					label: '服务费用',
-					price: ''
+					price: '*'
 				}, {
 					label: '关税金额',
-					price: ''
+					price: '*'
 				}, {
 					label: '物流费用',
-					price: ''
+					price: '*'
 				}],
 				supplyDetailList: [{
 					orderDate: '2021-03-21',
@@ -253,9 +253,9 @@
 					let data = res.Tag[0].Table[0]
 					this.orderDetailObj = data
 					this.orderTypeDetailFree[0].price = data.orderFee
-					this.orderTypeDetailFree[1].price = data.serviceFee
-					this.orderTypeDetailFree[2].price = data.taxFee
-					this.orderTypeDetailFree[3].price = data.logisticsFee
+					this.orderTypeDetailFree[1].price = data.serviceFee || '*'
+					this.orderTypeDetailFree[2].price = data.taxFee || '*'
+					this.orderTypeDetailFree[3].price = data.logisticsFee || '*'
 				})
 			},
 			// 获取报价信息

@@ -1,13 +1,15 @@
 <template>
 	<div class="app-container">
-		<div class="title-bg">供应交接管理</div>
+		<div class="title-bg">订单状态管理</div>
+		<div class="flex jsb flex-center">
+		  <searchCom @toSearch='search' :searchResult='searchResult' placeholderText='请输入你要找的采购编号'></searchCom>
+		</div>
 		<template v-if="tableData.length > 0">
 			<div class="mb10" style="border-bottom: 1px solid #999;padding-bottom: 10px;" v-for="item in tableData"
 				@click="toOrderDetail(item)">
 				<div class="mb10">
-					<el-button type="primary" @click.stop="openResult(item)">成果发布</el-button>
-					<el-button type="primary" @click.stop="openCancel(item)" :disabled="item.cancelBtn=='0'">取消订单</el-button>
-					<el-button type="primary" @click.stop="openConfirm(item)">供应完成</el-button>
+					<el-button type="primary" @click.stop="openResult(item)">查看成果</el-button>
+					<el-button type="primary" @click.stop="openDetail(item)">状态详情</el-button>
 				</div>
 				<div class="category-item flex-center">
 					<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + item.categoryImg"></el-image>
@@ -31,9 +33,8 @@
 		</template>
 		<pages @changePage="changePage" :total="pageTotal" :page="page"></pages>
 		<orderDetail v-if="isSupplyOrder" @close="closeSupplyOrder" :openRow="openRow" orderType="supply"></orderDetail>
-		<resultRelease v-if="isResult" :row="openRow" @close="closeResult" @refresh="getWaitHandleList"></resultRelease>
-		<cancelOrder v-if="isCancel" :row="openRow" @close="closeCancel" @refresh="getWaitHandleList"></cancelOrder>
-		<confirmOrder v-if="isConfirm" :row="openRow" @close="closeConfirm" @refresh="getWaitHandleList"></confirmOrder>
+		<resultRelease v-if="isResult" :row="openRow" @close="closeResult" pageType="check"></resultRelease>
+		<statusDetail v-if="isStatus" @close="closeStatus" :row="openRow"></statusDetail>
 	</div>
 </template>
 
@@ -41,17 +42,17 @@
 	import pages from '@/views/components/common/pages'
 	import orderDetail from '@/views/orderSupply/components/orderDetail.vue'
 	import resultRelease from '@/views/orderSupply/components/resultRelease.vue'
-	import cancelOrder from '@/views/orderSupply/components/cancelOrder.vue'
-	import confirmOrder from '@/views/orderSupply/components/confirmOrder.vue'
-	import { getWaitHandleList,getOrderDetail,updOrderReadCFlag } from '@/api/orderSupplyApi/orderSupply.js'
+	import searchCom from '@/views/components/common/searchCom.vue'
+	import statusDetail from '@/views/orderSupply/orderStatus/components/statusDetail.vue'
+	import { getOrderStatusList } from '@/api/orderSupplyApi/orderSupply.js'
 	export default {
 		name: "index",
 		components: {
 			pages,
 			orderDetail,
 			resultRelease,
-			cancelOrder,
-			confirmOrder
+			statusDetail,
+			searchCom
 		},
 		data() {
 			return {
@@ -63,20 +64,25 @@
 				isSupplyOrder: false,
 				basicImgUrl: this.$store.state.basics.img_url_cat,
 				isResult: false,
-				isCancel: false,
-				isConfirm: false
+				searchResult: 0,
+				searchVal: '',
+				isStatus: false,
 			};
 		},
 		methods: {
+			search(data) {
+			  this.searchVal = data
+			  this.page = 1
+			  //
+			},
 			changePage(page) {
 				this.page = page
-				this.getWaitHandleList()
+				this.getOrderStatusList()
 				//
 			},
 			toOrderDetail(item) {
 				this.isSupplyOrder = true
 				this.openRow = item
-				this.updOrderReadCFlag(item.orderGuid)
 			},
 			closeSupplyOrder() {
 				this.isSupplyOrder = false
@@ -88,19 +94,12 @@
 			closeResult() {
 				this.isResult = false
 			},
-			openCancel(item) {
-				this.isCancel = true
+			openDetail(item) {
+				this.isStatus = true
 				this.openRow = item
 			},
-			closeCancel() {
-				this.isCancel = false
-			},
-			openConfirm(item) {
-				this.isConfirm = true
-				this.openRow = item
-			},
-			closeConfirm() {
-				this.isConfirm = false
+			closeStatus() {
+				this.isStatus = false
 			},
 			// 关联方取消订单
 			otherCancelOrder() {
@@ -117,12 +116,12 @@
 					]),
 					confirmButtonText: '我知道了',
 				}).then(action => {
-					this.getWaitHandleList()
+					this.getOrderStatusList()
 				});
 			},
-			async getWaitHandleList() {
+			async getOrderStatusList() {
 				this.loading = true
-				await getWaitHandleList({
+				await getOrderStatusList({
 					sdPathGuid: this.$store.state.user.projectId.sdPathGuid,
 					size: '20',
 					curUserId: this.$store.state.user.adminId,
@@ -138,19 +137,12 @@
 							this.pageTotal = (this.page - 1) * 20 + 1
 						}
 					}
+					console.log(this.tableData);
 				})
-			},
-			async updOrderReadCFlag(orderGuid) {
-				await updOrderReadCFlag({
-					orderGuid: orderGuid,
-					curUserId: this.$store.state.user.adminId,
-				}).then(res => {
-					
-				})
-			},
+			}
 		},
 		created() {
-			this.getWaitHandleList()
+			this.getOrderStatusList()
 		}
 	}
 </script>

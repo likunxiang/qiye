@@ -69,7 +69,8 @@
       // 取消订单数据
       async getCancelOrderDetail() {
         await getCancelOrderDetail({
-          orderGuid: this.openRow.orderGuid
+          orderGuid: this.openRow.orderGuid,
+		  curUserId: this.$store.state.user.adminId,
         }).then(res => {
           let data = res.Tag[0].Table[0]
           this.orderObj = data
@@ -78,7 +79,8 @@
       // 退单数据
       async getRefundOrderDetail() {
         await getRefundOrderDetail({
-          orderGuid: this.openRow.orderGuid
+          orderGuid: this.openRow.orderGuid,
+		  curUserId: this.$store.state.user.adminId,
         }).then(res => {
           let data = res.Tag[0].Table[0]
           this.orderObj = data

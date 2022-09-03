@@ -1,0 +1,131 @@
+<template>
+	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
+		<div style="padding-top: 20px;padding-bottom: 40px;">
+			<div class="title-bg">结算详情</div>
+			<div class="flex flex-center jsb mb10" @click="toOrderDetail">
+				<div class="flex flex-center jsb">
+					<div class="flex">
+						<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + row.categoryImg"
+							fit="fit"></el-image>
+						<div>
+							<div>{{row.categoryName}}</div>
+							<div>{{row.categoryAlias}}</div>
+						</div>
+					</div>
+				</div>
+				<div class="flex flex-center">
+					<div>订单详情</div>
+					<div class="el-icon-arrow-right" style="font-size: 20px;"></div>
+				</div>
+			</div>
+			<div class="flex jsb">
+				<div>采购编号：{{row.orderNo}}</div>
+				<div>日期：{{row.orderTime}}</div>
+			</div>
+			<div class="title-bg mt10">应收金额</div>
+			<div>
+				<div class="my-label">金额</div>
+				<div class="mt10">{{tableData.fee}}</div>
+			</div>
+			<div class="title-bg mt10">付款进度</div>
+			<div>
+				<el-timeline>
+					<el-timeline-item v-for="(activity, index) in activities" :key="index" :icon="activity.icon"
+						:type="activity.type" :timestamp="activity.timestamp" :hide-timestamp="true">
+						<div class="flex flex-center">
+							<div style="width: 300px;">{{activity.content}}</div>
+							<el-button size="small" v-if="activity.buttonContent"
+								@click="clickButton(activity.buttonType)">{{activity.buttonContent}}</el-button>
+						</div>
+					</el-timeline-item>
+				</el-timeline>
+			</div>
+
+			<orderDetail v-if="isSupplyOrder" @close="closeSupplyOrder" :openRow="row" orderType="supply"></orderDetail>
+			<payProve v-if="isProve" @close="closeProve" :row="row" :payData="tableData"></payProve>
+		</div>
+	</el-dialog>
+</template>
+
+<script>
+	import orderDetail from '@/views/orderSupply/components/orderDetail.vue'
+	import payProve from '@/views/supplySettle/verifySettle/components/payProve.vue'
+	import { getOrderFeeSettleDetail } from '@/api/supplySettleApi/supplySettle.js'
+	export default {
+		name: "index",
+		components: {
+			orderDetail,
+			payProve
+		},
+		props: {
+			row: {
+				type: Object,
+				default: () => {
+					return {}
+				}
+			},
+		},
+		data() {
+			return {
+				isOpen: true,
+				basicImgUrl: this.$store.state.basics.img_url_cat,
+				activities: [{
+					content: '查看应收金额',
+					timestamp: '2018-04-15',
+					type: 'primary',
+					buttonContent: '',
+					buttonType: 1
+				}, {
+					content: '接收应收款项',
+					timestamp: '2018-04-13',
+					buttonContent: '查看付款证明',
+					buttonType: 2
+				}],
+				isSupplyOrder: false,
+				isProve: falsem,
+				tableData: {}
+			};
+		},
+		methods: {
+			close() {
+				this.isOpen = false
+				this.$emit('close')
+			},
+			beforeClose() {
+				this.close()
+			},
+			toOrderDetail() {
+				this.isSupplyOrder = true
+			},
+			closeSupplyOrder() {
+				this.isSupplyOrder = false
+			},
+			clickButton() {
+				this.isProve = true
+			},
+			closeProve() {
+				this.isProve = false
+			},
+			async getOrderFeeSettleDetail() {
+				await getOrderFeeSettleDetail({
+					orderFeeSettleGuid: this.row.orderFeeSettleGuid,
+					curUserId: this.$store.state.user.adminId,
+				}).then(res => {
+					if(res.OK == 'True') {
+						if (res.Tag.length) {
+							let data = res.Tag[0].Table[0]
+							this.tableData = data
+							this.activities[1].type = data.gainPayFlag === '0'?'':'primary'
+						}
+					}
+				})
+			}
+		},
+		created() {
+
+		}
+	};
+</script>
+
+<style lang="scss" scoped>
+</style>

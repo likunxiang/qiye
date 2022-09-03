@@ -1,13 +1,11 @@
 <template>
 	<div class="app-container">
-		<div class="title-bg">供应交接管理</div>
+		<div class="title-bg">违约费用缴纳</div>
 		<template v-if="tableData.length > 0">
 			<div class="mb10" style="border-bottom: 1px solid #999;padding-bottom: 10px;" v-for="item in tableData"
-				@click="toOrderDetail(item)">
+				@click="toSettleDetail(item)">
 				<div class="mb10">
-					<el-button type="primary" @click.stop="openResult(item)">成果发布</el-button>
-					<el-button type="primary" @click.stop="openCancel(item)" :disabled="item.cancelBtn=='0'">取消订单</el-button>
-					<el-button type="primary" @click.stop="openConfirm(item)">供应完成</el-button>
+					<el-button type="primary" @click.stop="findingDetail(item)">裁决结果</el-button>
 				</div>
 				<div class="category-item flex-center">
 					<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + item.categoryImg"></el-image>
@@ -16,9 +14,11 @@
 							<div>{{item.categoryName}}</div>
 							<div>{{item.categoryAlias}}</div>
 						</div>
-			
 					</div>
-					<div class="el-icon-arrow-right" style="font-size: 36px;"></div>
+					<div class="flex flex-center">
+						<div>未到款</div>
+						<div class="el-icon-arrow-right" style="font-size: 36px;"></div>
+					</div>
 				</div>
 				<div class="flex flex-center jsb">
 					<div>采购编号：{{item.orderNo}}</div>
@@ -30,28 +30,22 @@
 			<el-empty description="暂无数据"></el-empty>
 		</template>
 		<pages @changePage="changePage" :total="pageTotal" :page="page"></pages>
-		<orderDetail v-if="isSupplyOrder" @close="closeSupplyOrder" :openRow="openRow" orderType="supply"></orderDetail>
-		<resultRelease v-if="isResult" :row="openRow" @close="closeResult" @refresh="getWaitHandleList"></resultRelease>
-		<cancelOrder v-if="isCancel" :row="openRow" @close="closeCancel" @refresh="getWaitHandleList"></cancelOrder>
-		<confirmOrder v-if="isConfirm" :row="openRow" @close="closeConfirm" @refresh="getWaitHandleList"></confirmOrder>
+		<payDetail v-if="isDetail" @close="closeSettleDetail" :row="openRow"></payDetail>
+		<findingResult v-if="isFinding" @close="closeFindingDetail" :row="openRow"></findingResult>
 	</div>
 </template>
 
 <script>
 	import pages from '@/views/components/common/pages'
-	import orderDetail from '@/views/orderSupply/components/orderDetail.vue'
-	import resultRelease from '@/views/orderSupply/components/resultRelease.vue'
-	import cancelOrder from '@/views/orderSupply/components/cancelOrder.vue'
-	import confirmOrder from '@/views/orderSupply/components/confirmOrder.vue'
-	import { getWaitHandleList,getOrderDetail,updOrderReadCFlag } from '@/api/orderSupplyApi/orderSupply.js'
+	import findingResult from '@/views/components/common/findingResult.vue'
+	import payDetail from '@/views/supplySettle/defaultCost/components/payDetail.vue'
+	import { getJudgeFeeType1List } from '@/api/supplySettleApi/supplySettle.js'
 	export default {
 		name: "index",
 		components: {
 			pages,
-			orderDetail,
-			resultRelease,
-			cancelOrder,
-			confirmOrder
+			findingResult,
+			payDetail
 		},
 		data() {
 			return {
@@ -60,47 +54,31 @@
 				page: 1,
 				pageTotal: 0,
 				openRow: {},
-				isSupplyOrder: false,
 				basicImgUrl: this.$store.state.basics.img_url_cat,
-				isResult: false,
-				isCancel: false,
-				isConfirm: false
+				isDetail: false,
+				isFinding: false
 			};
 		},
 		methods: {
 			changePage(page) {
 				this.page = page
-				this.getWaitHandleList()
+				this.getJudgeFeeType1List()
 				//
 			},
-			toOrderDetail(item) {
-				this.isSupplyOrder = true
+			toSettleDetail(item) {
 				this.openRow = item
-				this.updOrderReadCFlag(item.orderGuid)
+				this.isDetail = true
 			},
-			closeSupplyOrder() {
-				this.isSupplyOrder = false
+			closeSettleDetail() {
+				this.isDetail = false
 			},
-			openResult(item) {
+			// 裁决结果批复
+			findingDetail(item) {
 				this.openRow = item
-				this.isResult = true
+			  this.isFinding = true
 			},
-			closeResult() {
-				this.isResult = false
-			},
-			openCancel(item) {
-				this.isCancel = true
-				this.openRow = item
-			},
-			closeCancel() {
-				this.isCancel = false
-			},
-			openConfirm(item) {
-				this.isConfirm = true
-				this.openRow = item
-			},
-			closeConfirm() {
-				this.isConfirm = false
+			closeFindingDetail() {
+			  this.isFinding = false
 			},
 			// 关联方取消订单
 			otherCancelOrder() {
@@ -117,12 +95,12 @@
 					]),
 					confirmButtonText: '我知道了',
 				}).then(action => {
-					this.getWaitHandleList()
+					this.getJudgeFeeType1List()
 				});
 			},
-			async getWaitHandleList() {
+			async getJudgeFeeType1List() {
 				this.loading = true
-				await getWaitHandleList({
+				await getJudgeFeeType1List({
 					sdPathGuid: this.$store.state.user.projectId.sdPathGuid,
 					size: '20',
 					curUserId: this.$store.state.user.adminId,
@@ -138,19 +116,12 @@
 							this.pageTotal = (this.page - 1) * 20 + 1
 						}
 					}
+					console.log(this.tableData);
 				})
-			},
-			async updOrderReadCFlag(orderGuid) {
-				await updOrderReadCFlag({
-					orderGuid: orderGuid,
-					curUserId: this.$store.state.user.adminId,
-				}).then(res => {
-					
-				})
-			},
+			}
 		},
 		created() {
-			this.getWaitHandleList()
+			this.getJudgeFeeType1List()
 		}
 	}
 </script>
