@@ -85,7 +85,7 @@ export function insertSupplierModelTc(data) {
 // web-供应-型号-查询某一品类需求范围的型号列表
 export function getModels(data) {
   return request({
-    url: '/QueryData?SqlCmdName=aprc\\webSuOrg\\supplier\\model\\info\\getModels_1_0_1&DBC=w_a',
+    url: '/QueryData?SqlCmdName=aprc\\webSuOrg\\supplier\\model\\info\\getModels_1_0_2&DBC=w_a',
     method: 'post',
     data: data
   })

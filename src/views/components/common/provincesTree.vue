@@ -30,7 +30,7 @@
 			return {
 				tableData: [{
 					cityGuid: '0',
-					cityName: '中国大陆',
+					cityName: '中国',
 					children: [{
 						cityName: '加载中...'
 					}]

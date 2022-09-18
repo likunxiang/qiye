@@ -1,7 +1,7 @@
 <template>
 	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
 		<div style="padding-bottom: 40px;padding-top: 20px;">
-			<el-result icon="success" title="成果上传提交成功" subTitle="采购编号：202222222222222">
+			<el-result icon="success" :title="title">
 				<template slot="subTitle">
 				    <div>
 						<div>【{{row.categoryName}}】</div>
@@ -9,7 +9,7 @@
 					</div>
 				  </template>
 				<template slot="extra">
-					<el-button type="primary" size="medium" @click="backList">返回供应交接管理</el-button>
+					<el-button type="primary" size="medium" @click="backList">{{buttonText}}</el-button>
 				</template>
 			</el-result>
 		</div>
@@ -31,6 +31,14 @@
 					return {}
 				}
 			},
+			title: {
+				type: String,
+				default: '',
+			},
+			buttonText: {
+				type: String,
+				default: '',
+			}
 		},
 		methods: {
 			close() {
@@ -46,7 +54,6 @@
 			}
 		},
 		created() {
-			this.title = ''
 			
 		}
 	};

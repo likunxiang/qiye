@@ -15,13 +15,13 @@
 			<div v-if="contentFDCode == 'c00009'">
 				<provincesTree @save="getProvinces" areaType="1"></provincesTree>
 			</div>
-			<div v-if="contentFDCode == 'c000010'">
+			<div v-if="contentFDCode == 'c00010'">
 				<provincesTree @save="getProvinces" areaType="2"></provincesTree>
 			</div>
-			<div v-if="contentFDCode == 'c000011'">
+			<div v-if="contentFDCode == 'c00011'">
 				<provincesTree @save="getProvinces" areaType="3"></provincesTree>
 			</div>
-			<div v-if="contentFDCode == 'c000012'">
+			<div v-if="contentFDCode == 'c00012'">
 				<provincesTree @save="getProvinces" areaType="4"></provincesTree>
 			</div>
 			<div v-if="contentFDCode == 'c00007'">
@@ -56,7 +56,7 @@
 			<div v-if="fieldObj.operation == '2' && !contentFDCode">
 				<div v-for="(item,index) in fieldContent" :key="index">
 					<div>
-						<el-checkbox-group v-model="checkList">
+						<el-checkbox-group v-model="checkList" @change="changeCheck">
 							<el-checkbox :label="item.display"></el-checkbox>
 						</el-checkbox-group>
 					</div>
@@ -95,7 +95,7 @@
 		</div>
 		<span slot="footer" class="dialog-footer">
 			<el-button @click="close">取 消</el-button>
-			<el-button type="primary" @click="submit" :disabled="!uploadUrl || !fieldValue || !checkList">保 存
+			<el-button type="primary" @click="submit" :disabled="!uploadUrl && !fieldValue">保 存
 			</el-button>
 		</span>
 	</el-dialog>
@@ -158,6 +158,7 @@
 				fieldValue: '',
 				contentSource: '',
 				fieldFDCode: '', // 字段code
+				step: 0,
 			};
 		},
 		methods: {
@@ -173,8 +174,16 @@
 							type: 'error'
 						});
 						this.fieldValue = ''
+					} else if (this.contentFDCode == 'c00018') {
+						let str = '00:00'
+						val = val.slice(0,14).concat(str)
+						this.fieldValue = val
 					}
 				}
+			},
+			changeCheck(val) {
+				this.checkList = val
+				this.fieldValue = this.checkList.toString()
 			},
 			close() {
 				this.isOpen = false
@@ -190,19 +199,20 @@
 					this.values[0] = {
 						value: this.fieldValue
 					}
+					this.close()
+					this.$emit('getValue', this.values)
 				} else if (operation == 2) {
-					let arr = []
-					for (let i in this.checkList) {
-						let obj = {
-							key: this.checkList[i]
-						}
-						arr.push(obj)
+					this.values[0] = {
+						value: this.fieldValue
 					}
-					this.values = arr
+					this.close()
+					this.$emit('getValue', this.values)
 				} else if (operation == 3) {
 					this.values[0] = {
 						value: this.fieldValue
 					}
+					this.close()
+					this.$emit('getValue', this.values)
 				} else if (operation == 4) {
 					let arr = []
 					for (let i in this.uploadUrl) {
@@ -212,6 +222,7 @@
 						arr.push(obj)
 					}
 					this.values = arr
+					this.$refs.upload.submit();
 				} else if (operation == 5) {
 					let arr = []
 					for (let i in this.uploadUrl) {
@@ -222,8 +233,7 @@
 					}
 					this.values = arr
 				}
-				this.close()
-				this.$emit('getValue', this.values)
+				
 			},
 			// 选地区时
 			chooseArea() {
@@ -232,11 +242,11 @@
 				let level = '0'
 				if (contentFDCode == 'c00009') {
 					level = '1'
-				} else if (contentFDCode == 'c000010') {
+				} else if (contentFDCode == 'c00010') {
 					level = '2'
-				} else if (contentFDCode == 'c000011') {
+				} else if (contentFDCode == 'c00011') {
 					level = '3'
-				} else if (contentFDCode == 'c000012') {
+				} else if (contentFDCode == 'c00012') {
 					level = '4'
 				}
 				this.fieldValue = data.address
@@ -263,13 +273,14 @@
 				const response = await uploadImgToBase64(item.file)
 				const base64File = response.result.replace(/.*;base64,/, '')
 				let FileName = item.file.name
-				let FilePath = 'judge\\images'
+				let FilePath = 'aprc\\plates\\imgs'
 				let data = base64File
 				upLoadImgApi(data, FileName, FilePath).then(res => {
 					if (res.OK == 'True') {
 						this.step++
 						if (this.step == this.imgList.length) {
-							this.NonSysMakeJudge()
+							this.close()
+							this.$emit('getValue', this.values)
 						}
 
 					}
@@ -449,7 +460,7 @@
 			this.operation = operation
 			this.fieldFDCode = fieldFDCode
 			this.fieldGuid = fieldGuid
-			if (operation == '1') {
+			if (operation == '1' || operation == '2') {
 				// 单选时 
 
 

@@ -20,7 +20,7 @@
 			<div class="title-bg mt10">证明内容</div>
 			<div>
 				<div class="my-label mb10">提交日期</div>
-				<div>{{tableData.payTime}}</div>
+				<div>{{tableData.confirmRefundPayProveTime}}</div>
 			</div>
 			<el-divider></el-divider>
 			<div>
@@ -30,18 +30,12 @@
 					</el-image>
 				</div>
 			</div>
-			<el-divider></el-divider>
-			<div>
-				<div class="my-label mb10">付款说明</div>
-				<div>{{tableData.payRemark}}</div>
-			</div>
 		</div>
 	</el-dialog>
 </template>
 
 <script>
 	import { getPaidProve } from '@/api/supplySettleApi/supplySettle.js'
-	import { getOrderFeeSettleDetail } from '@/api/supplySettleApi/supplySettle.js'
 	export default {
 		name: "index",
 		props: {
@@ -58,7 +52,7 @@
 				imgBasicUrl: this.$store.state.basics.img_url_cat,
 				imgList: [],
 				tableData: {},
-				imgBasicUrl1: this.$store.state.basics.img_url_set_obe,
+				imgBasicUrl1: this.$store.state.basics.img_url_ord,
 			};
 		},
 		methods: {
@@ -69,25 +63,25 @@
 			beforeClose() {
 				this.close()
 			},
-			async getOrderFeeSettleDetail() {
-				await getOrderFeeSettleDetail({
-					orderFeeSettleGuid: this.row.orderFeeSettleGuid,
+			async getPaidProve() {
+				await getPaidProve({
+					judgeFeeGuid: this.row.judgeFeeGuid,
 					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
 					if(res.OK == 'True') {
 						if(res.Tag.length) {
 							let data = res.Tag[0].Table[0]
 							this.tableData = data
-							this.imgList = data.payProve.split(',')
+							this.imgList = data.confirmRefundPayProve.split(',')
 							this.imgList = this.imgList.map(item => this.imgBasicUrl1 + item)
 						}
 					}
 				})
-			},
+			}
 
 		},
 		created() {
-			this.getOrderFeeSettleDetail()
+			this.getPaidProve()
 		}
 	};
 </script>

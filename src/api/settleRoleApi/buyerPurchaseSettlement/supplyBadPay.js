@@ -69,10 +69,8 @@ export function supplyObeygetPaidProve(data) {
 
 // web-查看裁决结果信息
 export function getJudgeResult(data) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
-    url: '/QueryData?SqlCmdName=web\\order\\settle\\demandDisobey\\getJudgeResult&DBC=w_m',
+    url: '/QueryData?SqlCmdName=web\\order\\settle\\demandDisobey\\getJudgeResult&DBC=w_a',
     method: 'post',
     data: data
   })

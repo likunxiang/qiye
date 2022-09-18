@@ -1,5 +1,5 @@
 <template>
-	<el-dialog title="违约费用缴纳规则" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
+	<el-dialog title="实物退货退款规则" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
 		<div style="padding-top: 20px;padding-bottom: 40px;">
 			<div class="flex flex-center jsb mb10">
 				<div style="width: 100%;" class="flex flex-center jsb">
@@ -21,7 +21,9 @@
 </template>
 
 <script>
-	import { getBizRuleById } from '@/api/commonApi.js'
+	import {
+		getBizRuleById
+	} from '@/api/commonApi.js'
 	export default {
 		name: "index",
 		props: {
@@ -37,7 +39,7 @@
 				isOpen: true,
 				imgBasicUrl: this.$store.state.basics.img_url_cat,
 				textData: '',
-				guid: 'c9b59c33-7374-11ec-a478-0242ac120003',
+				guid: 'c9b59bd4-7374-11ec-a478-0242ac120003',
 			};
 		},
 		methods: {
@@ -53,7 +55,7 @@
 					Guid: this.guid,
 					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
-					if(res.OK == 'True') {
+					if (res.OK == 'True') {
 						let data = res.Tag[0].Table[0].content
 						this.textData = data.replace(/\\n/g, '<br>')
 					}

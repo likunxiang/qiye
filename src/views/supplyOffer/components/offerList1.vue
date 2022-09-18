@@ -112,10 +112,12 @@
 				})
 			},
 			async rejectGivePrice(requestSupplyGuid) {
+				this.loading = true
 				await rejectGivePrice({
 					requestSupplyGuid: requestSupplyGuid,
 					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
+					this.loading = false
 					if (res.OK == 'True') {
 						if (res.Tag[0] > 0) {
 							this.$message({

@@ -30,8 +30,8 @@
 					<div class="mt10">{{dataObj.reason}}</div>
 				</div>
 				<div class="title-bg mt10">适用规则</div>
-				<div style="text-decoration: underline;color: #1890FF;">《{{dataObj.bizRuleType1Name}}》</div>
-				<div style="text-decoration: underline;color: #1890FF;">《{{dataObj.bizRuleType21Name}}》</div>
+				<div style="text-decoration: underline;color: #1890FF;" @click="openCancel">《{{dataObj.bizRuleType1Name}}》</div>
+				<div style="text-decoration: underline;color: #1890FF;" @click="openRefund1">《{{dataObj.bizRuleType21Name}}》</div>
 			</template>
 			<template v-if="pageType == '6'">
 				<div class="title-bg mt10">详情描述</div>
@@ -53,26 +53,26 @@
 					</div>
 				</div>
 				<div class="title-bg mt10">适用规则</div>
-				<div style="text-decoration: underline;color: #1890FF;">《{{dataObj.bizRuleType21Name}}》</div>
+				<div style="text-decoration: underline;color: #1890FF;" @click="openRefund1">《{{dataObj.bizRuleType21Name}}》</div>
 			</template>
 			<template v-if="pageType == '5' || pageType == '8' || pageType == '9'">
 				<div class="title-bg mt10">详情描述</div>
 				<div>
 					<div class="my-label">验收日期</div>
-					<div class="mt10">{{dataObj.demandAcceptTime}}</div>
+					<div class="mt10">{{dataObj.demandAcceptTime || dataObj.supplyAcceptTime}}</div>
 				</div>
 				<el-divider></el-divider>
 				<div>
 					<div class="my-label">验收方式</div>
-					<div class="mt10">{{dataObj.demandAcceptWay === '1'?'手工验收':'系统验收'}}</div>
+					<div class="mt10">{{dataObj.demandAcceptWay || dataObj.supplyAcceptWay === '1'?'手工验收':'系统验收'}}</div>
 				</div>
 				<el-divider></el-divider>
 				<div>
 					<div class="my-label">验收结果</div>
-					<div class="mt10">{{dataObj.demandAcceptStatus === '1'?'验收通过':'验收不通过'}}</div>
+					<div class="mt10">{{dataObj.demandAcceptStatus || dataObj.supplyAccept === '1'?'验收通过':'验收不通过'}}</div>
 				</div>
 				<div class="title-bg mt10">适用规则</div>
-				<div style="text-decoration: underline;color: #1890FF;">《{{data.bizRuleType2Name}}》</div>
+				<div style="text-decoration: underline;color: #1890FF;" @click="openClassVerifyRule">《{{dataObj.bizRuleType2Name || dataObj.bizRuleType22Name}}》</div>
 			</template>
 			<template v-if="pageType == '4'">
 				<div class="title-bg mt10">详情描述</div>
@@ -86,13 +86,13 @@
 					<div class="mt10">{{dataObj.supplyDoneFlag === '0'?'订单未处理':'订单已处理'}}</div>
 				</div>
 				<div class="title-bg mt10">适用规则</div>
-				<div style="text-decoration: underline;color: #1890FF;">《{{dataObj.bizRuleType3Name}}》</div>
+				<div style="text-decoration: underline;color: #1890FF;" @click="openConfirm">《{{dataObj.bizRuleType3Name}}》</div>
 			</template>
 			<template v-if="pageType == '7'">
 				<div class="title-bg mt10">详情描述</div>
 				<div>
 					<div class="my-label">提交日期</div>
-					<div class="mt10">{{proveObj.proveTime}}</div>
+					<div class="mt10">{{proveObj.proveLogisticTime}}</div>
 				</div>
 				<div class="title-bg mt10">需方退货信息</div>
 				<div>
@@ -116,8 +116,13 @@
 					</div>
 				</div>
 				<div class="title-bg mt10">适用规则</div>
-				<div style="text-decoration: underline;color: #1890FF;">《{{proveObj.bizRuleType23Name}}》</div>
+				<div style="text-decoration: underline;color: #1890FF;" @click="openEntityRefundRule">《{{proveObj.bizRuleType23Name}}》</div>
 			</template>
+			
+			<refundRule v-if="isRefund" @close="closeRefund1" :row="row"></refundRule>
+			<confirmRule v-if="isConfirm" @close="closeConfirm" :row="row"></confirmRule>
+			<classVerifyRule v-if="isClassVerifyRule" @close="closeClassVerifyRule" :row="row"></classVerifyRule>
+			<entityRefundRule v-if="isEntityRefundRule" @close="closeEntityRefundRule" :row="row"></entityRefundRule>
 		</div>
 	</el-dialog>
 </template>
@@ -131,9 +136,20 @@
 		getSupplyAcceptDetail,
 		getSupplyDoneDetail
 	} from '@/api/orderSupplyApi/orderSupply.js'
+	import refundRule from '@/views/orderSupply/components/refundRule.vue'
+	import confirmRule from '@/views/orderSupply/components/confirmRule.vue'
+	import classVerifyRule from '@/views/orderSupply/orderStatus/components/classVerifyRule.vue'
+	import entityRefundRule from '@/views/orderSupply/orderStatus/components/entityRefundRule.vue'
 	import { getDemandProveDetail } from '@/api/orderSupplyApi/orderSupply.js'
+	
 	export default {
 		name: "index",
+		components: {
+			refundRule,
+			confirmRule,
+			classVerifyRule,
+			entityRefundRule
+		},
 		props: {
 			row: {
 				type: Object,
@@ -152,11 +168,16 @@
 				basicImgUrl: this.$store.state.basics.img_url_cat,
 				imgBasicUrl1: this.$store.state.basics.img_url_ord,
 				isRule: false,
+				isRefund: false,
 				dataObj: {},
 				imgList: [],
 				proveImgs: [], // 退货证明图片
 				proveSupplySignImgs: [], // 需方提供的供方签收证明图片
 				proveObj: {}, // 退货证明数据
+				isConfirm: false,
+				isCancelRule: false,
+				isClassVerifyRule: false, // 品类验收规则
+				isEntityRefundRule: false, // 实物退货规则
 			};
 		},
 		methods: {
@@ -167,11 +188,44 @@
 			beforeClose() {
 				this.close()
 			},
+			// 实物退货退款规则
+			openEntityRefundRule() {
+				this.isEntityRefundRule = true
+			},
+			closeEntityRefundRule() {
+				this.isEntityRefundRule = false
+			},
+			// 品类验收规则
+			openClassVerifyRule() {
+				this.isClassVerifyRule = true
+			},
+			closeClassVerifyRule() {
+				this.isClassVerifyRule = false
+			},
+			openCancel() {
+				this.isCancelRule = true
+			},
+			closeCancel() {
+				this.isCancelRule = false
+			},
+			openConfirm() {
+				this.isConfirm = true
+			},
+			closeConfirm() {
+				this.isConfirm = false
+			},
 			openRefund() {
 				this.isRule = true
 			},
 			closeRefundRule() {
 				this.isRule = false
+			},
+			openRefund1() {
+				console.log(999);
+				this.isRefund = true
+			},
+			closeRefund1() {
+				this.isRefund = false
 			},
 			// 供应-查询供方处理订单情况(交付情况)
 			async getSupplyDoneDetail() {
@@ -251,7 +305,7 @@
 						if (res.Tag.length) {
 							let data = res.Tag[0].Table[0]
 							this.proveObj = data
-							this.proveImgs = data.proveImgs.split(',')
+							this.proveImgs = data.proveLogisticImgs.split(',')
 							this.proveImgs = this.proveImgs.map(item => this.imgBasicUrl1 + item)
 							this.proveSupplySignImgs = data.proveSupplySignImgs.split(',')
 							this.proveSupplySignImgs = this.proveSupplySignImgs.map(item => this.imgBasicUrl1 + item)

@@ -1,6 +1,6 @@
 <template>
 	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose">
-		<div style="padding-top: 20px;padding-bottom: 40px;">
+		<div style="padding-top: 20px;padding-bottom: 40px;" v-loading="loading">
 			<div class="flex flex-center jsb mb10">
 				<div style="width: 100%;" class="flex flex-center jsb">
 					<div class="flex">
@@ -93,7 +93,8 @@
 				isProve: false,
 				isPass: false,
 				pageType: 'pass',
-				addressType: 'new'
+				addressType: 'new',
+				loading: false,
 			};
 		},
 		methods: {
@@ -133,12 +134,15 @@
 			},
 			refreshTop() {
 				this.$emit('refresh')
+				this.close()
 			},
 			async getRefundDetail() {
+				this.loading = true
 				await getRefundDetail({
 					orderRefundGuid: this.row.orderRefundGuid,
 					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
+					this.loading = false
 					if(res.OK == 'True') {
 						if(res.Tag.length) {
 							let data = res.Tag[0].Table[0]
@@ -149,11 +153,13 @@
 									timestamp: '2018-04-13',
 									buttonContent: '查看收货地址',
 									type: 'primary',
-									buttonType: 2
+									buttonType: 6
 								}
+								console.log(this.activities);
 							}
-							this.activities[2].type = data.submitRefundAddrFlag == '1'?'primary':''
+							this.activities[2].type = data.demandSubmitProve == '1'?'primary':''
 							this.activities[3].type = data.demandSubmitProve == '1'?'primary':''
+							this.activities = this.clone(this.activities)
 						}
 					}
 				})

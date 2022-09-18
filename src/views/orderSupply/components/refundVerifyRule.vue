@@ -14,13 +14,16 @@
 				</div>
 			</div>
 			<el-divider></el-divider>
-			<div>文本标签</div>
+			<div v-html="textData"></div>
 
 		</div>
 	</el-dialog>
 </template>
 
 <script>
+	import {
+		getBizRuleById
+	} from '@/api/commonApi.js'
 	export default {
 		name: "index",
 		props: {
@@ -35,6 +38,8 @@
 			return {
 				isOpen: true,
 				imgBasicUrl: this.$store.state.basics.img_url_cat,
+				textData: '',
+				guid: 'c9b59ba5-7374-11ec-a478-0242ac120003',
 			};
 		},
 		methods: {
@@ -45,9 +50,20 @@
 			beforeClose() {
 				this.close()
 			},
+			async getBizRuleById() {
+				await getBizRuleById({
+					Guid: this.guid,
+					curUserId: this.$store.state.user.adminId,
+				}).then(res => {
+					if (res.OK == 'True') {
+						let data = res.Tag[0].Table[0].content
+						this.textData = data.replace(/\\n/g, '<br>')
+					}
+				})
+			}
 		},
 		created() {
-
+			this.getBizRuleById()
 		}
 	};
 </script>

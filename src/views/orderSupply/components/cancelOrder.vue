@@ -44,9 +44,10 @@
 			
 			<categoryCancelRule v-if="isCancelRule" @close="closeCancel" :row="row"></categoryCancelRule>
 			<refundRule v-if="isRefund" @close="closeRefund" :row="row"></refundRule>
+			<resultPop v-if="isResultPop" @close="closeResultPop" :row="row" @refresh="close" title="取消订单申请提交成功" buttonText="返回供应交接管理"></resultPop>
 		</div>
 		<span slot="footer" class="dialog-footer" v-if="!isCancel">
-			<el-button type="primary" @click="toCancel" :disabled="!isRadio">填写取消订单事由111</el-button>
+			<el-button type="primary" @click="toCancel" :disabled="!isRadio">填写取消订单事由</el-button>
 		</span>
 		<span slot="footer" class="dialog-footer" v-if="isCancel">
 			<el-button type="primary" @click="submit" :disabled="!textareaValue.trim()">保存</el-button>
@@ -57,6 +58,9 @@
 <script>
 	import categoryCancelRule from '@/views/orderSupply/components/categoryCancelRule.vue'
 	import refundRule from '@/views/orderSupply/components/refundRule.vue'
+	
+	import resultPop from '@/views/orderSupply/components/resultPop.vue'
+	import { cancelOrder } from '@/api/orderSupplyApi/orderSupply.js'
 	export default {
 		name: "index",
 		components: {
@@ -80,9 +84,16 @@
 				isRefund: false,
 				isCancel: false,
 				textareaValue: '',
+				isResultPop: false,
 			};
 		},
 		methods: {
+			openResultPop() {
+				this.isResultPop = true
+			},
+			closeResultPop() {
+				this.isResultPop = false
+			},
 			close() {
 				this.isOpen = false
 				this.$emit('close')
@@ -108,6 +119,35 @@
 			toCancel() {
 				console.log(999);
 				this.isCancel = true
+			},
+			async cancelOrder() {
+				await cancelOrder({
+					orderGuid: this.row.orderGuid,
+					curUserId: this.$store.state.user.adminId,
+					reason: this.textareaValue
+				}).then(res => {
+					if (res.OK == 'True') {
+						if (res.Tag.length) {
+							let data = res.Tag[0].Table[0]
+							if (data.cancelFlag > 0) {
+								this.$message({
+									message: '操作成功!',
+									type: 'success'
+								});
+								this.$emit('refresh')
+								this.close()
+							} else {
+								this.$message({
+									message: data.notOkReason,
+									type: 'error'
+								});
+							}
+						}
+					}
+				})
+			},
+			submit() {
+				this.cancelOrder()
 			}
 		},
 		created() {

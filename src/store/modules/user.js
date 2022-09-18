@@ -4,7 +4,8 @@ import {
 	login,
 	logout,
 	getInfo,
-	refreshToken
+	refreshToken,
+	getDefaultProject
 } from '@/api/login'
 import {
 	getToken,
@@ -17,6 +18,7 @@ import {
 	setDeptId,
 	getDeptId,
 	removeDeptId,
+	setProjectId,
 	getProjectId,
 } from '@/utils/auth'
 
@@ -56,6 +58,9 @@ const user = {
 		},
 		SET_DEPTID: (state, deptId) => {
 			state.deptId = deptId
+		},
+		updataProject:(state,project) =>  {
+			state.projectId = project
 		}
 	},
 
@@ -76,6 +81,12 @@ const user = {
 					setAdminId(data.userid)
 					commit('SET_TOKEN', data.token)
 					commit('SET_ADMINID', data.userid)
+					getDefaultProject().then(res => {
+						let data1 = res
+						this.choosedProject = data1.pathName
+						setProjectId(data1)
+						commit('updataProject', data1)
+					})
 					resolve()
 				}).catch(error => {
 					console.log(error);

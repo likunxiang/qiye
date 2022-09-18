@@ -43,7 +43,7 @@
 	import resultRelease from '@/views/orderSupply/components/resultRelease.vue'
 	import findingResult from '@/views/components/common/findingResult.vue'
 	import refundProgress from '@/views/orderSupply/components/refundProgress.vue'
-	import { getJudgeResultNo3OrderList,getOrderDetail } from '@/api/orderSupplyApi/orderSupply.js'
+	import { getJudgeResultNo3OrderList,getOrderDetail,refundAcceptW1 } from '@/api/orderSupplyApi/orderSupply.js'
 	export default {
 		name: "index",
 		components: {
@@ -82,7 +82,7 @@
 			},
 			openResult(item) {
 				this.openRow = item
-				isResult= true
+				this.isResult= true
 				// if(item.orderCatVirtualFlag == '1') {
 				// 	this.
 				// 	 isResult= true
@@ -120,10 +120,35 @@
 						]),
 						confirmButtonText: '我知道了',
 					}).then(action => {
-						this.getJudgeResultNo3OrderList()
+						this.refundAcceptW1(item)
+						
 					});
 				}
 				
+			},
+			
+			async refundAcceptW1(item) {
+				await refundAcceptW1({
+					orderGuid: item.orderGuid,
+					orderRefundGuid: item.orderRefundGuid,
+					bizRuleType22Guid: 'c9b59ba5-7374-11ec-a478-0242ac120003',
+					curUserId: this.$store.state.user.adminId,
+				}).then(res => {
+					if(res.OK == 'True') {
+						if (res.Tag[0] > 0) {
+							this.$message({
+								message: '操作成功!',
+								type: 'success'
+							});
+							this.getJudgeResultNo3OrderList()
+						} else {
+							this.$message({
+								message: '操作失败!',
+								type: 'error'
+							});
+						}
+					}
+				})
 			},
 			closeRefund() {
 				this.isRefund = false

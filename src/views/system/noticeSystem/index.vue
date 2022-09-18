@@ -33,7 +33,7 @@
 			<el-empty description="暂无数据"></el-empty>
 		</template>
 		<pages @changePage="changePage" :total="pageTotal" :page="page"></pages>
-		<settleDetail v-if="isDetail" @close="closeSettleDetail" :row="openRow"></settleDetail>
+		<settleDetail v-if="isDetail" @close="closeSettleDetail" :row="openRow" ></settleDetail>
 	</div>
 </template>
 
@@ -71,6 +71,7 @@
 			},
 			closeSettleDetail() {
 				this.isDetail = false
+				this.getList()
 			},
 			async getList() {
 				this.loading = true

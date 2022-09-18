@@ -117,3 +117,11 @@ export function getCodeImg() {
 		timeout: 20000
 	})
 }
+
+// 获取默认项目
+export function getDefaultProject(guid) {
+  return request({
+    url: '/Cache?Name=aprcComParam&Key=webDefaultSdPathName',
+    method: 'get',
+  })
+}

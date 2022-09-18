@@ -57,7 +57,7 @@
 				imgBasicUrl: this.$store.state.basics.img_url_cat,
 				imgList: [],
 				tableData: {},
-				imgBasicUrl1: this.$store.state.basics.img_url_ord,
+				imgBasicUrl1: this.$store.state.basics.img_url_set_obe,
 			};
 		},
 		methods: {

@@ -1,6 +1,6 @@
 <template>
 	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
-		<div class="" style="padding-top: 20px;">
+		<div class="" style="padding-top: 20px;max-height: 70vh;overflow-y: auto;">
 			<div class=" mb10" style="padding-bottom: 10px;">
 			<div class="category-item flex flex-center">
 				<el-image class="mr10" style="width: 100px; height: 100px" :src="basicImgUrl + category.categoryImg">
@@ -14,7 +14,7 @@
 				</div>
 			</div>
 		</div>
-		<plateModel v-if="isLoading" :plateData="plateArr"></plateModel>
+		<plateModel v-if="isLoading" :plateData="plateArr" :readonly='true' ></plateModel>
 		</div>
 	</el-dialog>
 </template>

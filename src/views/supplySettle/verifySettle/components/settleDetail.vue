@@ -35,7 +35,7 @@
 						<div class="flex flex-center">
 							<div style="width: 300px;">{{activity.content}}</div>
 							<el-button size="small" v-if="activity.buttonContent"
-								@click="clickButton(activity.buttonType)">{{activity.buttonContent}}</el-button>
+								@click="clickButton(activity.buttonType)" :type="activity.type" :disabled="activity.type != 'primary'">{{activity.buttonContent}}</el-button>
 						</div>
 					</el-timeline-item>
 				</el-timeline>
@@ -78,11 +78,12 @@
 				}, {
 					content: '接收应收款项',
 					timestamp: '2018-04-13',
+					type: '',
 					buttonContent: '查看付款证明',
 					buttonType: 2
 				}],
 				isSupplyOrder: false,
-				isProve: falsem,
+				isProve: false,
 				tableData: {}
 			};
 		},
@@ -122,7 +123,7 @@
 			}
 		},
 		created() {
-
+			this.getOrderFeeSettleDetail()
 		}
 	};
 </script>

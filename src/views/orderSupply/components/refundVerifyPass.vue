@@ -184,6 +184,7 @@
 								type: 'success'
 							});
 							this.$emit('refresh')
+							this.$emit('refreshTop')
 							this.close()
 						} else {
 							this.$message({
@@ -210,6 +211,7 @@
 								type: 'success'
 							});
 							this.$emit('refresh')
+							this.$emit('refreshTop')
 							this.close()
 						} else {
 							this.$message({

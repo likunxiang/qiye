@@ -13,7 +13,7 @@ export function orderSettleGetList(data) {
 // web-供应-查询订单验收通过结算详情
 export function getOrderFeeSettleDetail(data) {
   return request({
-    url: '/QueryData?SqlCmdName= aprc\\webSuOrg\\supply\\orderSettle\\getOrderFeeSettleDetail_1_0_1&DBC=w_a',
+    url: '/QueryData?SqlCmdName=aprc\\webSuOrg\\supply\\orderSettle\\getOrderFeeSettleDetail_1_0_1&DBC=w_a',
     method: 'post',
     data: data
   })

@@ -25,7 +25,7 @@
 			<div class="title-bg mt10">供方违约赔偿金额</div>
 			<div>
 				<div class="my-label">金额</div>
-				<div class="mt10">4800.00</div>
+				<div class="mt10">{{tableData.judgeFee}}</div>
 			</div>
 			<div class="title-bg mt10">赔偿办理进度</div>
 			<div>
@@ -35,7 +35,7 @@
 						<div class="flex flex-center">
 							<div style="width: 300px;">{{activity.content}}</div>
 							<el-button size="small" v-if="activity.buttonContent"
-								@click="clickButton(activity.buttonType)">{{activity.buttonContent}}</el-button>
+								@click="clickButton(activity.buttonType)" :type="activity.type" :disabled="activity.type!='primary'">{{activity.buttonContent}}</el-button>
 						</div>
 					</el-timeline-item>
 				</el-timeline>
@@ -44,7 +44,7 @@
 			<orderDetail v-if="isSupplyOrder" @close="closeSupplyOrder" :openRow="row" orderType="supply"></orderDetail>
 			<payProve v-if="isProve" @close="closeProve" :row="row"></payProve>
 			<choosePayWay v-if="isChoosePay" @close="closeChoosePay" @getPayWay="getPayWay"></choosePayWay>
-			<submitCollection v-if="isPayProve" @close="closePayProve" :row="row"></submitCollection>
+			<submitCollection v-if="isPayProve" @close="closePayProve" :row="row" @refresh="getJudgeFeeType2Detail"></submitCollection>
 			<checkCollection v-if="isCollection" @close="closeCollection" :row="row"></checkCollection>
 			<checkPayProve v-if="isCheckPayProve" @close="closeCheckPayProve" :row="row"></checkPayProve>
 		</div>
@@ -152,9 +152,10 @@
 					if(res.OK == 'True') {
 						if(res.Tag.length) {
 							let data = res.Tag[0].Table[0]
+							this.tableData = data
 							this.activities[1].type = data.submitBankFlag === '0'?'primary':''
 							this.activities[2].type = data.gainPayFlag === '3'?'primary':''
-							if (data.submitBankFlag === '1') {
+							if (data.submitBankFlag == '1') {
 								this.activities[1] = {
 									content: '提交收款账号',
 									timestamp: '2018-04-14',
@@ -169,7 +170,7 @@
 			}
 		},
 		created() {
-
+			this.getJudgeFeeType2Detail()
 		}
 	};
 </script>

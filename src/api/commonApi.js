@@ -3,10 +3,8 @@ import axios from 'axios'
 
 // web-查看裁决结果信息
 export function getJudgeResult(data) {
-  axios.defaults.baseURL = '/api'
   return request({
-    xf_url: '/api',
-    url: '/QueryData?SqlCmdName=web\\order\\settle\\demandDisobey\\getJudgeResult&DBC=w_m',
+    url: '/QueryData?SqlCmdName=web\\order\\settle\\demandDisobey\\getJudgeResult&DBC=w_a',
     method: 'post',
     data: data
   })
@@ -180,6 +178,52 @@ export function getByCode(data) {
     data: data
   })
 }
+
+// web-供应-微信支付-线上缴纳违约费用_1_0_1
+export function aprc_webSuOrg_order_wxpayJudgeFeeType(data) {
+  return request({
+    url: '/ProxyService/aprc_webSuOrg_order_wxpayJudgeFeeType1_1_0_1?CustomMimeType=application/json',
+    method: 'post',
+    data: data
+  })
+}
+
+// web-供应-支付宝支付-线上缴纳违约费用_1_0_1
+export function aprc_webSuOrg_order_alipayJudgeFeeType1(data) {
+  return request({
+    url: '/ProxyService/aprc_webSuOrg_order_alipayJudgeFeeType1_1_0_1?CustomMimeType=application/json',
+    method: 'post',
+    data: data
+  })
+}
+
+// web-供应-查询线上缴纳违约费用支付状态
+export function getPayStatus(data) {
+  return request({
+    url: '/QueryData?SqlCmdName=aprc\\webSuOrg\\supply\\orderJudge\\getPayStatus_1_0_1&DBC=w_a',
+    method: 'post',
+    data: data
+  })
+}
+
+// web-根据规则id查询交易规则详情
+export function getBizRuleById(data) {
+  return request({
+    url: '/QueryData?SqlCmdName=aprc\\web\\base\\getBizRuleById&DBC=w_a',
+    method: 'post',
+    data: data
+  })
+}
+
+// 获取默认项目
+export function getDefaultProject(guid) {
+  return request({
+    url: '/Cache?Name=aprcComParam&Key=webDefaultSdPathName',
+    method: 'get',
+  })
+}
+
+
 
 
 

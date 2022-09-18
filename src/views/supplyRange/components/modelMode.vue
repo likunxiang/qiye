@@ -1,6 +1,6 @@
 <template>
 	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
-		<div class="" style="padding-top: 20px;">
+		<div class="" style="padding-top: 20px;max-height: 70vh;overflow-y: auto;">
 			<div style="width: 100%;" class="flex flex-center jsb mb20">
 				<div class="flex">
 					<el-image style="width: 100px; height: 100px" :src="basicImgUrl + catogoryObj.categoryImg" fit="fill">
@@ -66,7 +66,8 @@
 				plateArr: [],
 				loading: false,
 				basicImgUrl: this.$store.state.basics.img_url_cat,
-				paramData: []
+				paramData: [],
+				fileLength: 0,
 			};
 		},
 		methods: {
@@ -90,11 +91,44 @@
 				console.log('paramData', data);
 			},
 			submit() {
-				if (this.pageType == 'new') {
-					this.getNewId()
+				let plateArr = this.paramData
+				let fileLength = 0
+				if (plateArr.length > 0) {
+					for (let p in plateArr) {
+						for (let f in plateArr[p].field) {
+							for (let v in plateArr[p].field[f].values) {
+								if (plateArr[p].field[f].values[v].value || plateArr[p].field[f].values[v].key) {
+									fileLength++
+									console.log(fileLength);
+								}
+				
+							}
+						}
+				
+				
+					}
+					if (fileLength < this.fileLength) {
+						this.$message({
+							type: 'error',
+							message: '还有信息未填'
+						});
+						
+					} else {
+						if (this.pageType == 'new') {
+							this.getNewId()
+						} else {
+							this.deleteModel()
+						}
+						
+					}
 				} else {
-					this.deleteModel()
+					this.$message({
+						type: 'error',
+						message: '还有信息未填'
+					});
 				}
+				
+				
 				
 			},
 			// 编辑时用
@@ -129,6 +163,14 @@
 						if (res.Tag.length) {
 							let data = res.Tag[0].Table
 							this.plateArr = data
+							let plateArr = data
+							for (let p in plateArr) {
+								for (let f in plateArr[p].field) {
+									this.fileLength++
+								}
+							
+							
+							}
 						} else {
 							this.plateArr = []
 						}
@@ -143,7 +185,12 @@
 					modelName: this.modelName,
 					curUserId: this.$store.state.user.adminId,
 				}
-				let plateArr = this.paramData
+				let plateArr = []
+				if(this.pageType == 'new') {
+					plateArr = this.paramData
+				} else {
+					plateArr = this.plateArr
+				}
 				let arr = []
 				console.log('plateArr',plateArr);
 				for (let p in plateArr) {
@@ -166,7 +213,7 @@
 								plateFieldAlias: plateArr[p].field[f].alias,
 								plateFieldCode: plateArr[p].field[f].fieldFDCode,
 								plateFieldNorder: plateArr[p].field[f].norder,
-								plateFieldValue: plateArr[p].field[f].values[v].value,
+								plateFieldValue: plateArr[p].field[f].values[v].value || plateArr[p].field[f].values[v].key,
 								fieldContentGc: contentFDCode,
 								operation: plateArr[p].field[f].operation,
 								curUserId: this.$store.state.user.adminId,

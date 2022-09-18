@@ -118,6 +118,7 @@
 					cancelButtonText: '取消',
 					type: 'warning'
 				}).then(() => {
+					this.submitBankInfo()
 				}).catch(() => {
 				});
 			},

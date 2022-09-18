@@ -30,6 +30,7 @@
 			</div>
 
 			<confirmRule v-if="isConfirm" @close="closeConfirm" :row="row"></confirmRule>
+			<resultPop v-if="isResultPop" @close="closeResultPop" :row="row" @refresh="close" title="订单确认完成提交成功" buttonText="返回供应交接管理"></resultPop>
 		</div>
 		<span slot="footer" class="dialog-footer">
 			<el-button type="primary" @click="toConfirm" :disabled="!isRadio">确认完成</el-button>
@@ -40,12 +41,14 @@
 <script>
 	import confirmRule from '@/views/orderSupply/components/confirmRule.vue'
 	import refundRule from '@/views/orderSupply/components/refundRule.vue'
+	import resultPop from '@/views/orderSupply/components/resultPop.vue'
 	import { orderSuDone } from '@/api/orderSupplyApi/orderSupply.js'
 	export default {
 		name: "index",
 		components: {
 			confirmRule,
 			refundRule,
+			resultPop
 		},
 		props: {
 			row: {
@@ -61,9 +64,17 @@
 				imgBasicUrl: this.$store.state.basics.img_url_cat,
 				isRadio: false,
 				isConfirm: false,
+				isResultPop: false,
+				
 			};
 		},
 		methods: {
+			openResultPop() {
+				this.isResultPop = true
+			},
+			closeResultPop() {
+				this.isResultPop = false
+			},
 			close() {
 				this.isOpen = false
 				this.$emit('close')

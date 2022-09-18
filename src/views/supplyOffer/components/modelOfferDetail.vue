@@ -1,6 +1,6 @@
 <template>
 	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
-		<div style="padding-bottom: 40px;padding-top: 20px;">
+		<div style="padding-bottom: 40px;padding-top: 20px;max-height: 70vh;overflow-y: auto;">
 			<div class="mb10" style="padding-bottom: 10px;">
 				<div class="flex flex-center">
 					<el-image class="mr10" style="width: 100px; height: 100px"
@@ -107,8 +107,10 @@
 					supplyCompanyName: '',
 				},
 				plateArr: [],
+				paramData: [],
 				isLoading: false,
-				pageType: 'new'
+				pageType: 'new',
+				fileLength: 0,
 			};
 		},
 		methods: {
@@ -133,6 +135,14 @@
 						if (res.Tag.length) {
 							let data = res.Tag[0].Table
 							this.plateArr = data
+							let plateArr = data
+							for (let p in plateArr) {
+								for (let f in plateArr[p].field) {
+									this.fileLength++
+								}
+							
+							
+							}
 						} else {
 							this.plateArr = []
 						}
@@ -153,15 +163,49 @@
 			submit() {
 				let offerData = this.offerData
 				if (offerData.bankUserName && offerData.bankUserNo && offerData.bankAddr && offerData.bankName && offerData.supplyCompanyName) {
-					if (this.offerType == 'single') {
-						this.insertBillPrice()
-					} else {
-						if(this.pageType == 'edit') {
-							this.deletePrice()
-						} else {
-							this.getNewId()
+					
+					let plateArr = this.paramData
+					let fileLength = 0
+					if (plateArr.length > 0) {
+						for (let p in plateArr) {
+							for (let f in plateArr[p].field) {
+								for (let v in plateArr[p].field[f].values) {
+									if (plateArr[p].field[f].values[v].value || plateArr[p].field[f].values[v].key) {
+										fileLength++
+										console.log(fileLength);
+									}
+					
+								}
+							}
+					
+					
 						}
+						if (fileLength < this.fileLength) {
+							this.$message({
+								type: 'error',
+								message: '还有信息未填'
+							});
+							
+						} else {
+							if (this.offerType == 'single') {
+								this.insertBillPrice()
+							} else {
+								if(this.pageType == 'edit') {
+									this.deletePrice()
+								} else {
+									this.getNewId()
+								}
+							}
+							
+						}
+					} else {
+						this.$message({
+							type: 'error',
+							message: '还有信息未填'
+						});
 					}
+					
+					
 					
 					
 				} else {
@@ -194,6 +238,7 @@
 							} else {
 								contentFDCode = plateArr[p].field[f].contentFDCode
 							}
+							console.log('valuessss',plateArr[p].field[f].values[v].value);
 							let obj = {
 								modelPriceGuid: guid,
 								modelGuid: this.row.modelGuid,
@@ -205,7 +250,7 @@
 								plateFieldAlias: plateArr[p].field[f].alias,
 								plateFieldCode: plateArr[p].field[f].fieldFDCode || '',
 								plateFieldNorder: plateArr[p].field[f].norder,
-								plateFieldValue: plateArr[p].field[f].fieldFDCode=='f00051'?(plateArr[p].field[f].values[v].value * 100).toString() : (plateArr[p].field[f].values[v].value).toString(),
+								plateFieldValue: plateArr[p].field[f].fieldFDCode=='f00051'?(plateArr[p].field[f].values[v].value * 100).toString() : (plateArr[p].field[f].values[v].value || plateArr[p].field[f].values[v].key).toString(),
 								fieldContentGc: contentFDCode,
 								operation: plateArr[p].field[f].operation,
 								curUserId: this.$store.state.user.adminId,
@@ -278,6 +323,7 @@
 							} else {
 								contentFDCode = plateArr[p].field[f].contentFDCode
 							}
+							console.log('valuessss',plateArr[p].field[f].values[v].value);
 							let obj = {
 								plateGuid: plateArr[p].plateGuid,
 								plateFDCode: plateArr[p].plateFDCode,
@@ -287,7 +333,7 @@
 								plateFieldAlias: plateArr[p].field[f].alias,
 								plateFieldFDCode: plateArr[p].field[f].fieldFDCode || '',
 								plateFieldNorder: plateArr[p].field[f].norder,
-								plateFieldValue: plateArr[p].field[f].fieldFDCode=='f00051'?(plateArr[p].field[f].values[v].value * 100).toString() : (plateArr[p].field[f].values[v].value).toString(),
+								plateFieldValue: plateArr[p].field[f].fieldFDCode=='f00051'?(plateArr[p].field[f].values[v].value * 100).toString() : (plateArr[p].field[f].values[v].value || plateArr[p].field[f].values[v].key).toString(),
 								fieldContentGc: contentFDCode,
 								operation: plateArr[p].field[f].operation,
 								curUserId: this.$store.state.user.adminId,

@@ -13,8 +13,8 @@
 						</div>
 					</div>
 					<div class="flex flex-center">
-						<div v-if="item.payType > 0">{{item.settleTime}}</div>
-						<div>{{item.payType == '0'?'未到款':'已到款'}}</div>
+						<div v-if="item.payType > 0" style='margin-top: 6px;'>{{item.settleTime}}</div>
+						<div>{{item.payType === '0'?'未到款':'已到款'}}</div>
 						<div class="el-icon-arrow-right" style="font-size: 36px;"></div>
 					</div>
 				</div>
@@ -69,10 +69,8 @@
 			async orderSettleGetList() {
 				this.loading = true
 				await orderSettleGetList({
-					sdPathGuid: this.$store.state.user.projectId.sdPathGuid,
-					size: '20',
+					cattypeGuid: this.$store.state.user.projectId.cattypeGuid,
 					curUserId: this.$store.state.user.adminId,
-					page: this.page
 				}).then(res =>  {
 					this.loading = false
 					if(res.OK == 'True') {

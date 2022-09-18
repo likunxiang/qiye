@@ -125,6 +125,7 @@
 					sdPathGuid: this.$store.state.user.projectId.sdPathGuid,
 					size: '20',
 					curUserId: this.$store.state.user.adminId,
+					orderNo: this.searchVal,
 					page: this.page
 				}).then(res =>  {
 					this.loading = false

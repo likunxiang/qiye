@@ -69,6 +69,11 @@
 	import RuoYiGit from '@/components/RuoYi/Git'
 	import RuoYiDoc from '@/components/RuoYi/Doc'
 	import changeProject from '@/views/components/common/changeProject'
+	import {
+		getProjectId,
+		setProjectId
+	} from '@/utils/auth'
+	import { getDefaultProject } from '@/api/commonApi.js'
 	export default {
 		components: {
 			Breadcrumb,
@@ -107,9 +112,15 @@
 		data() {
 			return {
 				isChange: false,
-				choosedProject: this.$store.state.user.projectId.treeTitleString1,
+				choosedProject: this.$store.state.user.projectId.treeTitleString1 || this.$store.state.user.projectId.pathName,
 			};
 		},
+		// mounted() {
+		// 	console.log('choosedProject',this.choosedProject);
+		// 	if(!this.$store.state.user.projectId.treeTitleString1) {
+		// 		this.getDefaultProject()
+		// 	}
+		// },
 		methods: {
 			changeProject() {
 				this.isChange = true
@@ -117,6 +128,16 @@
 			getChoosedProject(data) {
 				this.choosedProject = data
 			},
+			// async getDefaultProject() {
+			// 	await getDefaultProject().then(res => {
+			// 		let data = res
+			// 		this.choosedProject = data.pathName
+			// 		setProjectId(data)
+			// 		window.location.reload()
+			// 		// this.$store.commit('updataPreject',data)
+			// 	})
+			// },
+			
 			closeChangeProject() {
 				this.isChange = false
 			},

@@ -1,6 +1,6 @@
 <template>
 	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
-		<div style="padding-bottom: 40px;padding-top: 20px;">
+		<div style="padding-bottom: 40px;padding-top: 20px;max-height: 70vh;overflow-y: auto;">
 			<div class="title-bg">{{type === 1?'未报价的需方需求':type===2?'已报价的需方需求':'拒绝报价的需方需求'}}</div>
 			<div class="mb10" style="padding-bottom: 10px;">
 				<div class="mb10" v-if="type==2">{{row.PriceTime}}报价</div>
@@ -22,7 +22,7 @@
 					<el-tab-pane label="需求信息" name="first">
 						<div class="" style="padding-bottom: 40px;">
 							<div v-if="activeMain=='first'">
-								<plateModel v-if="isLoading" :plateData="plateArr"></plateModel>
+								<plateModel v-if="isLoading" :plateData="plateArr" :readonly="true"></plateModel>
 							</div>
 
 						</div>
@@ -36,7 +36,7 @@
 				</el-tabs>
 			</div>
 			<div v-else>
-				<plateModel v-if="isLoading" :plateData="plateArr"></plateModel>
+				<plateModel v-if="isLoading" :plateData="plateArr" :readonly="true"></plateModel>
 			</div>
 			<modelOfferDetail v-if="isOffer" @close="closeOffer" :catogoryObj='catogoryObj' :row="openRow"
 				@refresh='close' offerType="single"></modelOfferDetail>

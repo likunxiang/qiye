@@ -7,38 +7,45 @@
 					<div class="mb10 bold">{{field.alias}}</div>
 					
 				</div>
-				<div class="flex flex-center jsb" @click="toField(field,indexItem,indexField)" v-if="!field.values">
-					<div>请完善</div>
-					<div class="el-icon-arrow-right"></div>
-				</div>
-				<div  @click="toField(field,indexItem,indexField)">
-					<template v-if="field.operation < 4">
-						<div class="mb10" v-for="(value,indexField) in field.values" :key="indexField">
-							{{value.value}}
-						</div>
-						
-						<el-divider></el-divider>
-					</template>
-					<template v-else>
-						<template v-if="field.operation == 4">
-							<div v-for="(value,index) in field.values" class="mb10 flex flex-center"
-								style="flex-wrap: wrap;">
-								<el-image class="mr10 mb10" :preview-src-list="getImgUrl(value.value)"
-									style="width: 100px; height: 100px"
-									v-for="(img,index) in getImgUrl(value.value)" :key="index" :src="img">
-								</el-image>
+				<template v-if="!field.values">
+					<div class="flex flex-center jsb" @click="toField(field,indexItem,indexField)">
+						<div>请完善</div>
+						<div class="el-icon-arrow-right"></div>
+					</div>
+					<el-divider></el-divider>
+				</template>
+				<template v-else>
+					<div  @click="toField(field,indexItem,indexField)">
+						<template v-if="field.operation < 4">
+							<div class="flex flex-center jsb">
+								<div class="mb10" v-for="(value,indexField) in field.values" :key="indexField">
+									{{value.value}}
+								</div>
+								<div class="el-icon-arrow-right" v-if="!readonly"></div>
 							</div>
 							<el-divider></el-divider>
 						</template>
-						<template v-if="field.operation == 5">
-							<div v-for="(value,index) in field.values" class="mb10 flex flex-center"
-								style="flex-wrap: wrap;">
-								<div class="mr10 mb10">{{value.value}}</div>
-							</div>
-							<el-divider></el-divider>
+						<template v-else>
+							<template v-if="field.operation == 4">
+								<div v-for="(value,index) in field.values" class="mb10 flex flex-center"
+									style="flex-wrap: wrap;">
+									<el-image class="mr10 mb10"
+										style="width: 100px; height: 100px"
+										v-for="(img,index) in getImgUrl(value.value|| value.key)" :key="index" :src="img">
+									</el-image>
+								</div>
+								<el-divider></el-divider>
+							</template>
+							<template v-if="field.operation == 5">
+								<div v-for="(value,index) in field.values" class="mb10 flex flex-center"
+									style="flex-wrap: wrap;">
+									<div class="mr10 mb10">{{value.value|| value.key}}</div>
+								</div>
+								<el-divider></el-divider>
+							</template>
 						</template>
-					</template>
-				</div>
+					</div>
+				</template>
 			</div>
 		</div>
 		
@@ -95,6 +102,10 @@
 			pageType: {
 				type: String,
 				default: 'new'
+			},
+			readonly: {
+				type: Boolean,
+				default: false
 			}
 		},
 		components: {
@@ -114,14 +125,19 @@
 		methods: {
 			
 			getImgUrl(str) {
+				console.log('str',str);
 			  let imgArr = str.split(',')
 			
 			  for (let i in imgArr) {
 			    imgArr[i] = this.imgUrl + imgArr[i]
 			  }
+			  console.log(imgArr);
 			  return imgArr
 			},
 			toField(item,indexItem,indexField) {
+				if(this.readonly == true) {
+					return
+				}
 				console.log(item);
 				this.openRow = item
 				this.isSetting = true

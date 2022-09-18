@@ -1,6 +1,6 @@
 <template>
 	<el-dialog title="" :visible.sync="isOpen" width="700px" @close="beforeClose" append-to-body>
-		<div style="padding-top: 20px;padding-bottom: 40px;">
+		<div style="padding-top: 20px;padding-bottom: 40px;" v-loading="loading">
 			<div class="flex flex-center jsb mb10">
 				<div style="width: 100%;" class="flex flex-center jsb">
 					<div class="flex">
@@ -19,24 +19,46 @@
 			</div>
 			<div class="title-bg mt10">退货信息</div>
 
-			<div class="mt10">
-				<div class="flex flex-center mb10">
-					<div class="my-label">收货人</div>
-					<el-input v-model="consignee" placeholder="请输入内容"></el-input>
+			<template v-if="addressType == 'new'">
+				<div class="mt10">
+					<div class="flex flex-center mb10">
+						<div class="my-label">收货人</div>
+						<el-input v-model="consignee" placeholder="请输入内容"></el-input>
+					</div>
+					<div class="flex flex-center mb10">
+						<div class="my-label">国家/地区</div>
+						<div>中国大陆（+86）</div>
+					</div>
+					<div class="flex flex-center mb10">
+						<div class="my-label">联系电话</div>
+						<el-input v-model="phone" placeholder="请输入"></el-input>
+					</div>
+					<div class="flex flex-center mb10">
+						<div class="my-label">退货地址</div>
+						<el-input v-model="address" placeholder="请填写，格式：国家/地区-省-市-区/县-乡镇/街道-详细地址"></el-input>
+					</div>
 				</div>
-				<div class="flex flex-center mb10">
-					<div class="my-label">国家/地区</div>
-					<div>中国大陆（+86）</div>
+			</template>
+			<template v-if="addressType == 'edit'">
+				<div class="mt10">
+					<div class="flex flex-center mb10">
+						<div class="my-label">收货人</div>
+						<el-input v-model="consignee" :readonly="true" placeholder="请输入内容"></el-input>
+					</div>
+					<div class="flex flex-center mb10">
+						<div class="my-label">国家/地区</div>
+						<div>中国大陆（+86）</div>
+					</div>
+					<div class="flex flex-center mb10">
+						<div class="my-label">联系电话</div>
+						<el-input v-model="phone" :readonly="true" placeholder="请输入"></el-input>
+					</div>
+					<div class="flex flex-center mb10">
+						<div class="my-label">退货地址</div>
+						<el-input v-model="address" :readonly="true" placeholder="请填写，格式：国家/地区-省-市-区/县-乡镇/街道-详细地址"></el-input>
+					</div>
 				</div>
-				<div class="flex flex-center mb10">
-					<div class="my-label">联系电话</div>
-					<el-input v-model="phone" placeholder="请输入"></el-input>
-				</div>
-				<div class="flex flex-center mb10">
-					<div class="my-label">退货地址</div>
-					<el-input v-model="address" placeholder="请填写，格式：国家/地区-省-市-区/县-乡镇/街道-详细地址"></el-input>
-				</div>
-			</div>
+			</template>
 		</div>
 		<span slot="footer" class="dialog-footer" v-if="addressType == 'new'">
 			<el-button @click="close">取 消</el-button>
@@ -47,7 +69,8 @@
 
 <script>
 	import {
-		submitRefundAddr
+		submitRefundAddr,
+		getRefundSupplyAddr
 	} from '@/api/orderSupplyApi/orderSupply.js'
 	export default {
 		name: "index",
@@ -69,7 +92,8 @@
 				imgBasicUrl: this.$store.state.basics.img_url_cat,
 				consignee: '',
 				phone: '',
-				address: ''
+				address: '',
+				loading: false
 			};
 		},
 		methods: {
@@ -115,11 +139,28 @@
 						}
 					}
 				})
+			},
+			async getRefundSupplyAddr() {
+				this.loading = true
+				await getRefundSupplyAddr({
+					orderRefundGuid: this.row.orderRefundGuid,
+					curUserId: this.$store.state.user.adminId,
+				}).then(res => {
+					this.loading = false
+					if(res.OK == 'True') {
+						if(res.Tag.length) {
+							let data = res.Tag[0].Table[0]
+							this.consignee = data.receiverName
+							this.phone = data.receiverPhone
+							this.address = data.addr
+						}
+					}
+				})
 			}
 		},
 		created() {
 			if (this.addressType == 'edit') {
-
+				this.getRefundSupplyAddr()
 			} else {
 
 			}

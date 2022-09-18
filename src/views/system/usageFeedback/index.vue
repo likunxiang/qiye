@@ -33,9 +33,9 @@
 			</el-tab-pane>
 		</el-tabs>
 		<pages @changePage="changePage" :total="pageTotal" :page="page"></pages>
-		<newFeedback v-if="isFeedback" @close="closeFeedback" @refresh="getList"></newFeedback>
+		<newFeedback v-if="isFeedback" @close="closeFeedback" @refresh="refreshList"></newFeedback>
 		<checkReturn v-if="isReturn" @close="closeReturn" :row="openRow"></checkReturn>
-		<newFeedback1 v-if="isFeedback1" @close="closeFeedback1" @refresh="getList"></newFeedback1>
+		<newFeedback1 v-if="isFeedback1" @close="closeFeedback1" @refresh="refreshList"></newFeedback1>
 		<checkReturn1 v-if="isReturn1" @close="closeReturn1"></checkReturn1>
 	</div>
 </template>
@@ -74,6 +74,13 @@
 			};
 		},
 		methods: {
+			refreshList() {
+				if (this.activeName == 'first') {
+					this.getList()
+				} else {
+					this.getListByType()
+				}
+			},
 			changePage(page) {
 				this.page = page
 				if (this.activeName == 'first') {
@@ -109,6 +116,8 @@
 				this.isFeedback1 = false
 			},
 			handleClick(tab, event) {
+				this.page = 1
+				this.tableData = []
 				if (this.activeName == 'first') {
 					this.getList()
 				} else {
@@ -116,6 +125,7 @@
 				}
 			},
 			async getList() {
+				this.loading = true
 				await getList({
 					replyFlag: '2',
 					content: '',
@@ -123,6 +133,7 @@
 					size: '20',
 					page: this.page
 				}).then(res => {
+					this.loading = false
 					if (res.OK == 'True') {
 						if (res.Tag.length) {
 							this.tableData = res.Tag[0].Table
@@ -135,11 +146,13 @@
 				})
 			},
 			async getListByType() {
+				this.loading = true
 				await getListByType({
 					curUserId: this.$store.state.user.adminId,
 					size: '20',
 					page: this.page
 				}).then(res => {
+					this.loading = false
 					if (res.OK == 'True') {
 						if (res.Tag.length) {
 							this.tableData = res.Tag[0].Table

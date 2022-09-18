@@ -37,6 +37,15 @@ export function orderSubmitOutcome(data) {
   })
 }
 
+// web-供应-取消订单申请
+export function cancelOrder(data) {
+  return request({
+    url: '/QueryData?SqlCmdName= aprc\\webSuOrg\\supply\\order\\cancelOrder_1_0_1&DBC=w_a',
+    method: 'post',
+    data: data
+  })
+}
+
 // web-供应-更新订单阅读取消标志为已读
 export function updOrderReadCFlag(data) {
   return request({
@@ -55,6 +64,15 @@ export function getJudgeResultNo3OrderList(data) {
   })
 }
 
+// web-供应-查询成果详情
+export function getOutcomeDetailData(data) {
+  return request({
+    url: '/QueryData?SqlCmdName=aprc\\webSuOrg\\supply\\orderRefund\\getCancelBriefDetail_1_0_1,aprc\\webSuOrg\\supply\\orderRefund\\getOutcomeDetails_1_0_1,aprc\\webSuOrg\\supply\\orderRefund\\getOutcomeDetailData_1_0_1&DBC=w_a',
+    method: 'post',
+    data: data
+  })
+}
+
 // web-供应-查询退货签收详情
 export function getRefundDetail(data) {
   return request({
@@ -68,6 +86,15 @@ export function getRefundDetail(data) {
 export function submitRefundAddr(data) {
   return request({
     url: '/ExSql?SqlCmdName=aprc\\webSuOrg\\supply\\orderRefund\\submitRefundAddr_1_0_1&DBC=w_a',
+    method: 'post',
+    data: data
+  })
+}
+
+// web-供应-查询供方收货地址
+export function getRefundSupplyAddr(data) {
+  return request({
+    url: '/QueryData?SqlCmdName=aprc\\webSuOrg\\supply\\orderRefund\\getRefundSupplyAddr_1_0_1&DBC=w_a',
     method: 'post',
     data: data
   })

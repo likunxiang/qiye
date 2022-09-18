@@ -39,7 +39,7 @@
 						</div>
 						<el-button type="primary" @click="creationModel">创建型号</el-button>
 					</div>
-					<el-table :data="modelData" border>
+					<el-table :data="modelData" border :row-class-name="tableRowClassName">
 						<el-table-column prop="modelName" label="品类名称" align="center"></el-table-column>
 						<el-table-column label="操作" align="center">
 							<template slot-scope="scope">
@@ -110,21 +110,65 @@
 				userPriceMode: '1', // 模式
 				paramData: [],
 				isLoading: false,
-				catogoryObj: {}
+				catogoryObj: {},
+				fileLength: 0,
 			};
 		},
 		methods: {
+			tableRowClassName({
+				row,
+				rowIndex
+			}) {
+				console.log(row);
+				if (row.modelStatus === '0') {
+					return 'warning-row'
+				} else {
+					return ''
+				}
+			},
 			getParamData(data) {
 				this.paramData = data
 				console.log('paramData', data);
 			},
 
 			submit() {
-				if (this.pageType == 'edit') {
-					this.deleteBill()
+				let plateArr = this.paramData
+				let fileLength = 0
+				if (plateArr.length > 0) {
+					for (let p in plateArr) {
+						for (let f in plateArr[p].field) {
+							for (let v in plateArr[p].field[f].values) {
+								if (plateArr[p].field[f].values[v].value || plateArr[p].field[f].values[v].key) {
+									fileLength++
+									console.log(fileLength);
+								}
+
+							}
+						}
+
+
+					}
+					if (fileLength < this.fileLength) {
+						this.$message({
+							type: 'error',
+							message: '还有信息未填'
+						});
+						
+					} else {
+						if (this.pageType == 'edit') {
+							this.deleteBill()
+						} else {
+							this.insertBill()
+						}
+						
+					}
 				} else {
-					this.insertBill()
+					this.$message({
+						type: 'error',
+						message: '还有信息未填'
+					});
 				}
+
 
 			},
 
@@ -265,7 +309,7 @@
 						if (this.userPriceMode == '1') {
 							this.deleteModelBySupplierGuid()
 						} else {
-							this.deleteBill()
+							this.deleteBill(true)
 						}
 						// this.userPriceMode = userPriceMode
 						this.getRangeFlag()
@@ -293,14 +337,16 @@
 				})
 			},
 			// 按单-关闭需求范围调用该删除接口
-			async deleteBill() {
+			async deleteBill(isDel) {
+				this.loading = true
 				await deleteBill({
 					supplierGuid: this.row.supplierGuid,
 					curUserId: this.$store.state.user.adminId,
 				}).then(res => {
+					this.loading = false
 					if (res.OK == 'True') {
 						if (res.Tag[0] > 0) {
-							if (this.pageType == 'edit') {
+							if (this.pageType == 'edit' && !isDel) {
 								this.insertBill()
 							} else {
 								// this.$message({
@@ -340,7 +386,7 @@
 			},
 			// 按单-新增需求范围内容
 			async insertBill() {
-
+				this.loading = true
 				let plateArr = this.paramData
 				let arr = []
 				for (let p in plateArr) {
@@ -364,7 +410,7 @@
 								plateFieldAlias: plateArr[p].field[f].alias,
 								plateFieldCode: plateArr[p].field[f].fieldFDCode,
 								plateFieldNorder: plateArr[p].field[f].norder,
-								plateFieldValue: plateArr[p].field[f].values[v].value,
+								plateFieldValue: plateArr[p].field[f].values[v].value || plateArr[p].field[f].values[v].key,
 								fieldContentGc: contentFDCode,
 								operation: plateArr[p].field[f].operation,
 								curUserId: this.$store.state.user.adminId,
@@ -377,6 +423,7 @@
 				}
 
 				await insertBill(JSON.stringify(arr)).then(res => {
+					this.loading = false
 					if (res.OK == 'True') {
 						if (res.Tag[0] > 0) {
 							this.$message({
@@ -426,6 +473,14 @@
 						if (res.Tag.length) {
 							let data = res.Tag[0].Table
 							this.modelData = data
+							for (let i in data) {
+								if (data[i].modelStatus === '0') {
+									this.$confirm('该品类的交易信息有变动，请及时更正，不然影响采购需求接收。', '提示', {
+										confirmButtonText: '知道了',
+										type: 'warning'
+									}).then(() => {}).catch(() => {});
+								}
+							}
 						} else {
 							this.modelData = []
 						}
@@ -469,6 +524,14 @@
 						if (res.Tag.length) {
 							let data = res.Tag[0].Table
 							this.plateArr = data
+							let plateArr = data
+							for (let p in plateArr) {
+								for (let f in plateArr[p].field) {
+									this.fileLength++
+								}
+
+
+							}
 						} else {
 							this.plateArr = []
 						}
@@ -483,5 +546,8 @@
 	};
 </script>
 
-<style lang="scss" scoped>
+<style>
+	.warning-row {
+		background: #D9001B !important;
+	}
 </style>

@@ -39,9 +39,10 @@
 			},
 			submit() {
 				let payWay = this.payWay
-				this.$emit('getChooseType', payWay)
+				this.$emit('getPayWay', payWay)
 				this.close()
-			}
+			},
+			
 		},
 		created() {
 

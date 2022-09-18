@@ -20,7 +20,7 @@
 			<div class="title-bg mt10">退货信息</div>
 			<div>
 				<div class="my-label">提交日期</div>
-				<div class="mt10">{{proveObj.proveTime}}</div>
+				<div class="mt10">{{proveObj.proveLogisticTime}}</div>
 			</div>
 			<div class="title-bg mt10">需方退货信息</div>
 			<div>
@@ -44,22 +44,19 @@
 				</div>
 			</div>
 			<div class="title-bg mt10">适用规则</div>
-			<div style="text-decoration: underline;color: #1890FF;">《{{proveObj.bizRuleType23Name}}》</div>
+			<div style="text-decoration: underline;color: #1890FF;" @click="openEntityRefundRule">《{{proveObj.bizRuleType23Name}}》</div>
 		</div>
+		<entityRefundRule v-if="isEntityRefundRule" @close="closeEntityRefundRule" :row="row"></entityRefundRule>
 	</el-dialog>
 </template>
 
 <script>
+	import entityRefundRule from '@/views/orderSupply/orderStatus/components/entityRefundRule.vue'
 	import { getDemandProveDetail } from '@/api/orderSupplyApi/orderSupply.js'
 	export default {
 		name: "index",
-		props: {
-			row: {
-				type: Object,
-				default: () => {
-					return {}
-				}
-			},
+		components: {
+			entityRefundRule
 		},
 		props: {
 			row: {
@@ -77,6 +74,8 @@
 				proveObj: {},
 				proveImgs: [], // 退货证明图片
 				proveSupplySignImgs: [], // 需方提供的供方签收证明图片
+				isEntityRefundRule: false, // 实物退货规则
+
 			};
 		},
 		methods: {
@@ -87,6 +86,13 @@
 			beforeClose() {
 				this.close()
 			},
+			// 实物退货退款规则
+			openEntityRefundRule() {
+				this.isEntityRefundRule = true
+			},
+			closeEntityRefundRule() {
+				this.isEntityRefundRule = false
+			},
 			async getDemandProveDetail() {
 				await getDemandProveDetail({
 					orderGuid: this.row.orderGuid,
@@ -96,7 +102,7 @@
 						if (res.Tag.length) {
 							let data = res.Tag[0].Table[0]
 							this.proveObj = data
-							this.proveImgs = data.proveImgs.split(',')
+							this.proveImgs = data.proveLogisticImgs.split(',')
 							this.proveImgs = this.proveImgs.map(item => this.imgBasicUrl1 + item)
 							this.proveSupplySignImgs = data.proveSupplySignImgs.split(',')
 							this.proveSupplySignImgs = this.proveSupplySignImgs.map(item => this.imgBasicUrl1 + item)

@@ -16,7 +16,7 @@
 						</div>
 					</div>
 					<div class="flex flex-center">
-						<div>{{item.judgeFeePayType==='0'?'未办理':'已赔偿'}}</div>
+						<div>{{(item.judgeFeePayStatus != '2' && item.judgeFeePayStatus != '3')?"未缴纳":'已缴纳'}}</div>
 						<div class="el-icon-arrow-right" style="font-size: 36px;"></div>
 					</div>
 				</div>

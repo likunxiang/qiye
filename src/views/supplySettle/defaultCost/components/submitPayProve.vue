@@ -116,7 +116,7 @@
 				this.isInput = false
 			},
 			submit() {
-				
+				this.$refs.upload.submit();
 			},
 			async updateJudgeFeeType1() {
 				await updateJudgeFeeType1({
